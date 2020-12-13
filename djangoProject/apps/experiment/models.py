@@ -34,7 +34,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(BasicIngredient)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class Product(models.Model):
@@ -82,7 +82,7 @@ class Sample(models.Model):
     supplement = models.ManyToManyField(Supplement)
 
     def __str__(self):
-        return self.name
+        return str(self.id)
 
 
 class Metrics(models.Model):
@@ -102,7 +102,7 @@ class DetailedMetrics(models.Model):
     sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class Result(models.Model):
@@ -113,7 +113,7 @@ class Result(models.Model):
     detailedMetric = models.ForeignKey(DetailedMetrics, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class Experiment(models.Model):
