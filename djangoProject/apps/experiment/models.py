@@ -38,7 +38,7 @@ class Recipe(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(primary_key=True, max_length=300, unique=True, editable=False)
+    name = models.CharField(primary_key=True, max_length=300, unique=True)
     description = models.CharField(max_length=1500)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
