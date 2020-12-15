@@ -1,10 +1,13 @@
+from django.shortcuts import render
 from rest_framework import viewsets
 from .serializers import *
 from .models import *
 import io
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
 import xlsxwriter
 import json
+from .forms import UploadFileForm
+from .functions import handle_experiment_data
 
 
 class CategoryView(viewsets.ModelViewSet):
@@ -71,15 +74,6 @@ class ExperimentView(viewsets.ModelViewSet):
     serializer_class = ExperimentSerializer
     queryset = Experiment.objects.all()
 
-"""{
-    "experiment_data" : ["test", "testowy", "www", "Kornelia", "06.12.2020"],
-    "metrices" : [["1", "3", "3", "1", "1", ["120"], "wilgotność"]]
-}"""
-
-
-#request body:
-#experiment_data, supplement_name, percentage_of_supplement, metrices
-#experiment_data [nazwa,opis,link autor,data utworzenia]
 #metrices list of lists of elements ['name','num_series', 'num_repeats', 'id_próbki', 'num_of_values_external_factor', 'list_of_values_external_factor', 'metrice_id']
 def generate_experiment_excel(request):
     body_unicode = request.body.decode('utf-8')
@@ -121,17 +115,17 @@ def generate_experiment_excel(request):
             worksheet.write(cell, val, cell_format_blue)
             counter = counter + 1
             row_counter = 3
-        for i in [k for k in range(1, int(data[4]) + 1)]:
+        for i in [k for k in range(1, int(data[1]) + 1)]:
             series = "SERIA " + str(i)
             cell = 'B' + str(row_counter) + ":" + str(chr(ord('B') + int(data[4]) - 1)) + str(row_counter)
-            if int(data[4]) - 1:
+            if int(data[1]) - 1:
                 worksheet.merge_range(cell, series, cell_format_blue)
             else:
                 worksheet.write(cell, series, cell_format_blue)
-            row_counter = row_counter + int(data[2])
-            for j in range(1, int(data[2])):
+            row_counter = row_counter + int(data[1])
+            for j in range(1, int(data[2])+1):
                 cellPomiar = 'A' + str(row_counter - j)
-                to_write = "pomiar " + str(int(data[2]) - j)
+                to_write = "pomiar " + str(int(data[2]) - j + 1)
                 worksheet.write(cellPomiar, to_write, cell_format_blue)
                 for b in range(0, len(data[5])):
                     cell = str(chr(ord('B') + b)) + str(row_counter - j)
@@ -147,4 +141,14 @@ def generate_experiment_excel(request):
 
     return response
 
+
+def read_experiment_data_from_xlsx(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_experiment_data(request.FILES['file'])
+            return HttpResponseRedirect('/success/url/')
+    else:
+        form = UploadFileForm()
+    return render(request, 'upload.html', {'form': form})
 
