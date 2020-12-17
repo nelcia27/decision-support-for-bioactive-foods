@@ -68,13 +68,13 @@ class MetricsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ResultSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Result
-        fields = '__all__'
-
-
 class ExperimentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experiment
+        fields = '__all__'
+
+
+class ResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Result
         fields = '__all__'

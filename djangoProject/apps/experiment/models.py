@@ -105,17 +105,6 @@ class DetailedMetrics(models.Model):
         return str(self.id)
 
 
-class Result(models.Model):
-    id = models.AutoField(primary_key=True)
-    value = models.CharField(blank=False, max_length=1500)
-    numberOfRepeat = models.PositiveIntegerField(blank=False)
-    numberOfSeries = models.PositiveIntegerField(blank=False)
-    detailedMetric = models.ForeignKey(DetailedMetrics, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return str(self.id)
-
-
 class Experiment(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=400)
@@ -130,6 +119,18 @@ class Experiment(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Result(models.Model):
+    id = models.AutoField(primary_key=True)
+    value = models.CharField(blank=False, max_length=1500)
+    numberOfRepeat = models.PositiveIntegerField(blank=False)
+    numberOfSeries = models.PositiveIntegerField(blank=False)
+    detailedMetric = models.ForeignKey(DetailedMetrics, on_delete=models.CASCADE)
+    experiment = models.ForeignKey(Experiment, on_delete=models.CASCADE, default=1)
+
+    def __str__(self):
+        return str(self.id)
 
 
 

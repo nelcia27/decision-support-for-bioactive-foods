@@ -8,6 +8,7 @@ import xlsxwriter
 import json
 from .forms import UploadFileForm
 from .functions import handle_experiment_data
+from django.views.decorators.csrf import csrf_exempt
 
 
 class CategoryView(viewsets.ModelViewSet):
@@ -65,14 +66,15 @@ class DetailedMetricsView(viewsets.ModelViewSet):
     queryset = DetailedMetrics.objects.all()
 
 
+class ExperimentView(viewsets.ModelViewSet):
+    serializer_class = ExperimentSerializer
+    queryset = Experiment.objects.all()
+
+
 class ResultView(viewsets.ModelViewSet):
     serializer_class = ResultSerializer
     queryset = Result.objects.all()
 
-
-class ExperimentView(viewsets.ModelViewSet):
-    serializer_class = ExperimentSerializer
-    queryset = Experiment.objects.all()
 
 #metrices list of lists of elements ['name','num_series', 'num_repeats', 'id_próbki', 'num_of_values_external_factor', 'list_of_values_external_factor', 'metrice_id']
 def generate_experiment_excel(request):
@@ -122,7 +124,7 @@ def generate_experiment_excel(request):
                 worksheet.merge_range(cell, series, cell_format_blue)
             else:
                 worksheet.write(cell, series, cell_format_blue)
-            row_counter = row_counter + int(data[1])
+            row_counter = row_counter + int(data[2]) + 1
             for j in range(1, int(data[2])+1):
                 cellPomiar = 'A' + str(row_counter - j)
                 to_write = "pomiar " + str(int(data[2]) - j + 1)
@@ -133,22 +135,22 @@ def generate_experiment_excel(request):
     workbook.close()
     output.seek(0)
 
-    filename = str(experiment_data[0]) + str(experiment_data[3]) + ".xlsx"
-    #filename = "abc.xlsx"
+    filename = str(experiment_data[3]) + ".xlsx"
     response = HttpResponse(output.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     response['Content-Disposition'] = "attachment; filename=" + filename
     output.close()
 
     return response
 
-
+@csrf_exempt
 def read_experiment_data_from_xlsx(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             handle_experiment_data(request.FILES['file'])
-            return HttpResponseRedirect('/success/url/')
-    else:
-        form = UploadFileForm()
-    return render(request, 'upload.html', {'form': form})
+            return HttpResponse(status=200)
+        print(form.errors)
+    #else:
+        #form = UploadFileForm()
+    return HttpResponse(status=500)
 
