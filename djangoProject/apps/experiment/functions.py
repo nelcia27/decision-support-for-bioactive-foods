@@ -20,9 +20,9 @@ def handle_experiment_data(file):
                 serie = []
                 for j in range(0, infos.numberOfRepeat):
                     measure = ""
-                    rowcounter = rowcounter + j
+                    if j != 0:
+                        rowcounter = rowcounter + 1
                     for k in range(0, external_factor.numberOfValues):
-                        print(external_factor.numberOfValues)
                         if measure == "":
                             measure = measure + str(sheet.cell_value(rowx=rowcounter, colx=colcounter + k))
                         else:
