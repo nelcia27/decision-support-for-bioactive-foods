@@ -77,6 +77,7 @@ class ResultView(viewsets.ModelViewSet):
 
 
 #metrices list of lists of elements ['name','num_series', 'num_repeats', 'id_próbki', 'num_of_values_external_factor', 'list_of_values_external_factor', 'metrice_id']
+@csrf_exempt
 def generate_experiment_excel(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
