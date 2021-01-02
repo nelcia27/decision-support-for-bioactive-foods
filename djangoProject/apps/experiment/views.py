@@ -3,12 +3,14 @@ from rest_framework import viewsets
 from .serializers import *
 from .models import *
 import io
-from django.http.response import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponse, FileResponse
 import xlsxwriter
 import json
 from .forms import UploadFileForm
 from .functions import handle_experiment_data
 from django.views.decorators.csrf import csrf_exempt
+from reportlab.pdfgen import canvas
+from PIL import Image
 
 
 class CategoryView(viewsets.ModelViewSet):
@@ -154,4 +156,27 @@ def read_experiment_data_from_xlsx(request):
     #else:
         #form = UploadFileForm()
     return HttpResponse(status=500)
+
+
+@csrf_exempt
+def generatePDF(request):
+    buffer = io.BytesIO()
+
+    p = canvas.Canvas(buffer)
+
+    p.drawString(100, 100, "Hello world.")
+
+    p.showPage()
+    p.save()
+
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
+
+
+@csrf_exempt
+def generatePlots(request):
+    red = Image.new('RGB', (1, 1), (255,0,0,0))
+    response = HttpResponse(content_type="image/jpeg")
+    red.save(response, "JPEG")
+    return response
 
