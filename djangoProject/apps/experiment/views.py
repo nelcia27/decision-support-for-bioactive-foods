@@ -2,16 +2,14 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .serializers import *
 from .models import *
-import io
+import io, base64
 from django.http.response import HttpResponse, FileResponse
 import xlsxwriter
 import json
 from .forms import UploadFileForm
-from .functions import handle_experiment_data
+from .functions import handle_experiment_data, handle_radar_plot
 from django.views.decorators.csrf import csrf_exempt
 from reportlab.pdfgen import canvas
-from PIL import Image
-
 
 class CategoryView(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -175,8 +173,28 @@ def generatePDF(request):
 
 @csrf_exempt
 def generatePlots(request):
-    red = Image.new('RGB', (1, 1), (255,0,0,0))
-    response = HttpResponse(content_type="image/jpeg")
-    red.save(response, "JPEG")
+    #{
+    #   experiment_id:__,
+    #   samples:[_],
+    #   plot_types:[__,__]
+    #}
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    arr = []
+    print(body_unicode)
+    for plot in body["plot_types"]:
+        figs = handle_radar_plot(body['experiment_id'],body['samples'])
+        for f in figs:
+            buffer = io.BytesIO()
+            f.savefig(buffer)
+            to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
+            arr.append(to_return)
+
+    v = json.dumps(dict({
+        "plots": arr
+    }))
+
+    response = HttpResponse(content_type="application/json")
+    response.write(v)
     return response
 
