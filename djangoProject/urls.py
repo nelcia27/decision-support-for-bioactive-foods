@@ -20,6 +20,6 @@ from djangoProject.apps.experiment.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('authentication/', include('djangoProject.apps.authentication.urls')),
-    path('api/', include('djangoProject.apps.experiment.urls'))
+    path('api/', include('djangoProject.apps.experiment.urls',)),
+    path('api2/', include('djangoProject.apps.authentication.urls')),
 ]
