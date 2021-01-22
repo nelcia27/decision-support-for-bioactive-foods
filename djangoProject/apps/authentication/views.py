@@ -250,3 +250,28 @@ def super_user(request):
     response = HttpResponse(json.dumps(response_data))
     response.status_code = 400
     return(response)
+
+@csrf_exempt
+def add_super_power(request):
+    response_data = {}
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    name = body['username']
+    if request.method == "POST":
+        try:
+            user_tmp = User.objects.get(username=name)
+        except:
+            response_data['message'] = 'uzytkownik nie istnieje'
+            response = HttpResponse(json.dumps(response_data))
+            response.status_code = 400
+            return (response)
+        user_tmp.is_superuser = True
+        user_tmp.save()
+        response_data['message'] = str(user_tmp.username) + " został superuserem"
+        response = HttpResponse(json.dumps(response_data))
+        response.status_code = 200
+        return(response)
+    response_data['message'] = 'not GET'
+    response = HttpResponse(json.dumps(response_data))
+    response.status_code = 400
+    return(response)
