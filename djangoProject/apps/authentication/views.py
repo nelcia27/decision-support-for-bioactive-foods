@@ -12,7 +12,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 import json
 from django.contrib.auth import logout
-
+from django.contrib.sessions.models import Session
+from django.utils import timezone
 
 # views.py
 from django.shortcuts import render, redirect
@@ -181,16 +182,16 @@ def delete_user(response):
     return(response)
 
 @csrf_exempt
-def sign_in(response):
+def sign_in(request):
     response_data = {}
-    body_unicode = response.body.decode('utf-8')
+    body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
     name = body['username']
     password = body['password']
-    if response.method == "POST":
+    if request.method == "POST":
         user = authenticate(username=name, password=password)
-        print("there")
         if user is not None:
+            login(request,user)
             response_data['message'] = 'logged correctly'
             response = HttpResponse(json.dumps(response_data))
             response.status_code = 200
@@ -213,3 +214,20 @@ def sign_out(request):
     response = HttpResponse(json.dumps(response_data))
     response.status_code = 200
     return(response)
+
+@csrf_exempt
+def active_users(request):
+    response_data = {}
+    if request.method == "GET":
+        sessions = Session.objects.filter(expire_date__gte=timezone.now())
+        uid_list = []
+        for session in sessions:
+            data = session.get_decoded()
+            uid_list.append(data.get('_auth_user_id', None))
+        response = HttpResponse(json.dumps(uid_list))
+        response.status_code = 200
+        return (response)
+    response_data['message'] = 'not GET'
+    response = HttpResponse(json.dumps(response_data))
+    response.status_code = 400
+    return (response)
