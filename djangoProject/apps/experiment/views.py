@@ -180,3 +180,9 @@ def generatePlots(request):
     red.save(response, "JPEG")
     return response
 
+@csrf_exempt
+def generateStats(request):
+    red = Image.new('RGB', (1, 1), (255,0,0,0))
+    response = HttpResponse(content_type="image/jpeg")
+    red.save(response, "JPEG")
+    return response
