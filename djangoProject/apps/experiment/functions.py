@@ -49,10 +49,10 @@ def handle_experiment_data(file):
                     r = Result(value=res[1][i][j], numberOfRepeat=j + 1, numberOfSeries=i + 1, detailedMetric_id=res[0], experiment_id=experimentId)
                     r.save()
 
-def handle_radar_plot(experiment_id,sample_array):
+def handle_data_table(experiment_id,sample_array):
     ef_set = set([])
     dm_res_dict = dict()
-    samp_dict = dict()
+    table = dict()
     #pobranie rezultatów
     results = Result.objects.filter(experiment=experiment_id)
     samples = []
@@ -61,54 +61,74 @@ def handle_radar_plot(experiment_id,sample_array):
         s = Sample.objects.get(id=id)
         ef_set.add(s.externalFactor)
         samples.append(s)
-        samp_dict[s.id]=[]
+        table[str(s.id)] = []
     if(len(ef_set)>1):
         raise AttributeError()
-    ef = ExternalFactor.objects.get(name=ef_set.pop())
     #zebranie wyników o jednej metryce do jednej tablicy
     for r in results:
         try:
             dm_res_dict[str(r.detailedMetric)]
         except KeyError as identifier:
-            dm_res_dict[str(r.detailedMetric)] = []
-        dm_res_dict[str(r.detailedMetric)].append((r.numberOfRepeat,r.numberOfSeries, r.value.split(",")))
+            dm_res_dict[str(r.detailedMetric.id)] = []
+        dm_res_dict[str(r.detailedMetric.id)].append((r.numberOfRepeat,r.numberOfSeries, r.value.split(",")))
     keys = dm_res_dict.keys()
-    #zredukowanie tablic do postaci próbka: [(metryka sz, tablica uśr. wyników)..]
+    #wygenerowanie tablicy
     for k in keys:
         dm = DetailedMetrics.objects.get(id=k)
         if not(dm.sample.id in sample_array):
             continue
-        val = ef.numberOfValues
-        arr = np.zeros(val)
+        #nagłówek składa się z id próbki, danych o metryce, liczby serii i powtórzeń
+        arr = []
         for r in dm_res_dict[k]:
-            for i in range(0,val):
-                arr[i]+=float(r[2][i])
-        s = dm.sample
-        samp_dict[s.id].append((s,dm,arr/len(dm_res_dict[k])))
-    keys = samp_dict.keys()
+            arr_in = []
+            for n in r[2]:
+                arr_in.append(float(n))
+            arr.append(arr_in)
+        table[str(dm.sample.id)].append((dm.metric.name+" - "+dm.metric.unit, dm.numberOfSeries, dm.numberOfRepeat, arr))
+    keys = table.keys()
+    sortfunc = lambda x : x[0]
+    for k in keys:
+        table[k].sort(key=sortfunc)
+    return table
+
+def handle_radar_plot(experiment_id,sample_array):
+    #sprawdzenie czy próbki są z jednego czynnika zewnętrznego
+    ef_set = set([])
+    for id in sample_array:
+        s = Sample.objects.get(id=id)
+        ef_set.add(s.externalFactor)
+    if(len(ef_set)>1):
+        raise AttributeError()
+    #pobranie "czystej tabeli" z danymi
+    table = handle_data_table(experiment_id,sample_array)
+    keys = table.keys()
+    ef = ef_set.pop()
     val = ef.numberOfValues
     ret = []
-    etiq= []
     ymax = 0
     x = 0
     for i in range(0,val):
         x = 0
-        fig = plt.figure(figsize=(5,5))
+        fig = plt.figure(figsize=(7,7))
         for k in keys:
-            y = []
             etiq = []
-            for r in samp_dict[k]:
-                etiq.append(r[1].metric.name + " - "+r[1].metric.unit)
-                y.append(r[2][i])
-                if r[2][i] >ymax:
-                    ymax = r[2][i]
+            y = []
+            for pack in table[k]:
+                etiq.append(pack[0])
+                tmp = np.mean(np.transpose(np.array(pack[3]))[i])
+                y.append(tmp)
+                if ymax < tmp:
+                    ymax=tmp
             x = np.linspace(start=0,stop=360,num=len(etiq)) /180 * np.pi
             y+=y[:1]
-            plt.polar(np.append(x,x[0]),y,'o-')
+            pol = plt.polar(np.append(x,x[0]),y,'o-')
+            pol[0].set_label("Próbka "+k)
         plt.xticks(x,etiq)
         ret.append(fig)
+    rticks = np.linspace(0,ymax,num=int(ymax))
     for f in ret:
         for ax in f.get_axes():
-            ax.set_rticks(np.linspace(0,ymax,num=4))
-    
-    return ret
+            ax.set_rticks(rticks)
+            ax.set_anchor('N')
+            ax.legend(loc=8, ncol=len(keys)/5+1)
+    return ret,table

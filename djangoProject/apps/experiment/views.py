@@ -181,17 +181,18 @@ def generatePlots(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
     arr = []
-    print(body_unicode)
+    table = dict()
     for plot in body["plot_types"]:
-        figs = handle_radar_plot(body['experiment_id'],body['samples'])
-        for f in figs:
-            buffer = io.BytesIO()
-            f.savefig(buffer)
-            to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
-            arr.append(to_return)
-
+        if plot.lower() == "radar":
+            figs, table = handle_radar_plot(body['experiment_id'],body['samples'])
+            for f in figs:
+                buffer = io.BytesIO()
+                f.savefig(buffer)
+                to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
+                arr.append(to_return)
     v = json.dumps(dict({
-        "plots": arr
+        "plots": arr,
+        "raw_table": table
     }))
 
     response = HttpResponse(content_type="application/json")
