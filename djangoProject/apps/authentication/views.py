@@ -9,7 +9,11 @@ from django.http.response import HttpResponse, FileResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 import json
+from django.contrib.auth import logout
+
+
 # views.py
 from django.shortcuts import render, redirect
 from .forms import RegisterForm
@@ -174,4 +178,38 @@ def delete_user(response):
     response_data['message'] = 'not POST'
     response = HttpResponse(json.dumps(response_data))
     response.status_code = 400
+    return(response)
+
+@csrf_exempt
+def sign_in(response):
+    response_data = {}
+    body_unicode = response.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    name = body['username']
+    password = body['password']
+    if response.method == "POST":
+        user = authenticate(username=name, password=password)
+        print("there")
+        if user is not None:
+            response_data['message'] = 'logged correctly'
+            response = HttpResponse(json.dumps(response_data))
+            response.status_code = 200
+            return(response)
+        else:
+            response_data['message'] = 'invalid username or password'
+            response = HttpResponse(json.dumps(response_data))
+            response.status_code = 400
+            return(response)
+    response_data['message'] = 'not POST'
+    response = HttpResponse(json.dumps(response_data))
+    response.status_code = 400
+    return(response)
+
+@csrf_exempt
+def sign_out(request):
+    logout(request)
+    response_data = {}
+    response_data['message'] = 'logged out correctly'
+    response = HttpResponse(json.dumps(response_data))
+    response.status_code = 200
     return(response)
