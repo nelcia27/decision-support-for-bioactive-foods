@@ -231,3 +231,22 @@ def active_users(request):
     response = HttpResponse(json.dumps(response_data))
     response.status_code = 400
     return (response)
+
+@csrf_exempt
+def super_user(request):
+    response_data = {}
+    if request.method == "GET":
+        if request.user.is_superuser:
+            response_data['message'] = 'TRUE'
+            response = HttpResponse(json.dumps(response_data))
+            response.status_code = 200
+            return (response)
+        else:
+            response_data['message'] = 'FALSE'
+            response = HttpResponse(json.dumps(response_data))
+            response.status_code = 200
+            return (response)
+    response_data['message'] = 'not GET'
+    response = HttpResponse(json.dumps(response_data))
+    response.status_code = 400
+    return(response)
