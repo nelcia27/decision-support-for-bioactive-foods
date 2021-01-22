@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ab90ccf3-91c2-4a03-8f8f-b7e2447a4579" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/djangoProject/apps/authentication/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/authentication/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/djangoProject/apps/authentication/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/authentication/views.py" afterDir="false" />
     </list>
@@ -16,8 +17,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
-              <caret line="225" column="60" lean-forward="true" selection-start-line="225" selection-start-column="60" selection-end-line="225" selection-end-column="60" />
+            <state relative-caret-position="437">
+              <caret line="241" column="37" lean-forward="true" selection-start-line="241" selection-start-column="37" selection-end-line="241" selection-end-column="37" />
               <folding>
                 <element signature="e#0#51#0" expanded="true" />
               </folding>
@@ -29,7 +30,7 @@
         <entry file="file://$PROJECT_DIR$/djangoProject/apps/experiment/admin.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="374">
-              <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
+              <caret line="22" selection-start-line="22" selection-end-line="22" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
               </folding>
@@ -40,8 +41,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/djangoProject/apps/experiment/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="250">
-              <caret line="157" column="24" lean-forward="true" selection-start-line="157" selection-start-column="24" selection-end-line="157" selection-end-column="34" />
+            <state relative-caret-position="267">
+              <caret line="158" selection-start-line="158" selection-end-line="158" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -50,32 +51,8 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/functions.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="488">
-              <caret line="31" column="29" lean-forward="true" selection-start-line="31" selection-start-column="29" selection-end-line="31" selection-end-column="29" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/admin.py">
           <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/forms.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" column="35" selection-start-line="5" selection-start-column="19" selection-end-line="5" selection-end-column="35" />
-              <folding>
-                <element signature="e#0#24#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -89,15 +66,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/serializers.py">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="15" column="73" selection-start-line="15" selection-start-column="73" selection-end-line="15" selection-end-column="73" />
+            <state relative-caret-position="289">
+              <caret line="17" column="1" lean-forward="true" selection-start-line="17" selection-start-column="1" selection-end-line="17" selection-end-column="1" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -140,7 +112,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="1080" />
     <option name="width" value="835" />
     <option name="height" value="1040" />
@@ -257,13 +229,7 @@
     <entry file="file://$PROJECT_DIR$/djangoProject/wsgi.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/templates/authentication/signup.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="47" lean-forward="true" selection-start-line="14" selection-start-column="47" selection-end-line="14" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/templates/authentication/signup.html" />
     <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -274,13 +240,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/templates/authentication/base.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="7" selection-start-line="12" selection-start-column="7" selection-end-line="12" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/templates/authentication/base.html" />
     <entry file="file://$PROJECT_DIR$/djangoProject/apps/experiment/serializers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-787">
@@ -326,13 +286,7 @@
     <entry file="file://$PROJECT_DIR$/djangoProject/apps/experiment/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/templates/authentication/register.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="26" selection-start-column="26" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/templates/authentication/register.html" />
     <entry file="file://$PROJECT_DIR$/djangoProject/apps/experiment/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="80">
@@ -345,8 +299,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/djangoProject/apps/experiment/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="157" column="24" lean-forward="true" selection-start-line="157" selection-start-column="24" selection-end-line="157" selection-end-column="34" />
+        <state relative-caret-position="267">
+          <caret line="158" selection-start-line="158" selection-end-line="158" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
@@ -356,7 +310,7 @@
     <entry file="file://$PROJECT_DIR$/djangoProject/apps/experiment/admin.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
-          <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
           </folding>
@@ -397,8 +351,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="73" selection-start-line="15" selection-start-column="73" selection-end-line="15" selection-end-column="73" />
+        <state relative-caret-position="289">
+          <caret line="17" column="1" lean-forward="true" selection-start-line="17" selection-start-column="1" selection-end-line="17" selection-end-column="1" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
@@ -407,8 +361,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="225" column="60" lean-forward="true" selection-start-line="225" selection-start-column="60" selection-end-line="225" selection-end-column="60" />
+        <state relative-caret-position="437">
+          <caret line="241" column="37" lean-forward="true" selection-start-line="241" selection-start-column="37" selection-end-line="241" selection-end-column="37" />
           <folding>
             <element signature="e#0#51#0" expanded="true" />
           </folding>
