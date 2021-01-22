@@ -82,10 +82,10 @@ def get_users(response):
     response_data = {}
     if response.method == "GET":
         user = get_user_model()
-        user_list = list(user.objects.values('username','email','is_superuser'))
+        user_list = list(user.objects.values('username','email','is_staff'))
         not_superuser = []
         for i in range(len(user_list)):
-            if user_list[i]['is_superuser'] == False:
+            if user_list[i]['is_staff'] == False:
                 not_superuser.append(user_list[i])
         response = HttpResponse(json.dumps(not_superuser))
         response.status_code = 200
@@ -268,6 +268,31 @@ def add_super_power(request):
         user_tmp.is_superuser = True
         user_tmp.save()
         response_data['message'] = str(user_tmp.username) + " został superuserem"
+        response = HttpResponse(json.dumps(response_data))
+        response.status_code = 200
+        return(response)
+    response_data['message'] = 'not GET'
+    response = HttpResponse(json.dumps(response_data))
+    response.status_code = 400
+    return(response)
+
+@csrf_exempt
+def not_so_super(request):
+    response_data = {}
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    name = body['username']
+    if request.method == "POST":
+        try:
+            user_tmp = User.objects.get(username=name)
+        except:
+            response_data['message'] = 'uzytkownik nie istnieje'
+            response = HttpResponse(json.dumps(response_data))
+            response.status_code = 400
+            return (response)
+        user_tmp.is_superuser = False
+        user_tmp.save()
+        response_data['message'] = str(user_tmp.username) + " został zwyklym userem"
         response = HttpResponse(json.dumps(response_data))
         response.status_code = 200
         return(response)
