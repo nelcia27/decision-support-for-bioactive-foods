@@ -91,7 +91,15 @@ def handle_data_table(experiment_id,sample_array):
         table[k].sort(key=sortfunc)
     return table
 
-def handle_radar_plot(experiment_id,sample_array):
+def handle_bar_plot(experiment_id,sample_array,table):
+    to_return = []
+    return to_return
+
+def handle_linear_plot(experiment_id,sample_array,table):
+    to_return = []
+    return to_return
+
+def handle_radar_plot(experiment_id,sample_array,table):
     #sprawdzenie czy próbki są z jednego czynnika zewnętrznego
     ef_set = set([])
     for id in sample_array:
@@ -131,4 +139,4 @@ def handle_radar_plot(experiment_id,sample_array):
             ax.set_rticks(rticks)
             ax.set_anchor('N')
             ax.legend(loc=8, ncol=len(keys)/5+1)
-    return ret,table
+    return ret

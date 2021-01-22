@@ -7,7 +7,7 @@ from django.http.response import HttpResponse, FileResponse
 import xlsxwriter
 import json
 from .forms import UploadFileForm
-from .functions import handle_experiment_data, handle_radar_plot
+from .functions import handle_experiment_data, handle_radar_plot, handle_data_table, handle_bar_plot, handle_linear_plot
 from django.views.decorators.csrf import csrf_exempt
 from reportlab.pdfgen import canvas
 
@@ -181,15 +181,20 @@ def generatePlots(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
     arr = []
-    table = dict()
+    table = handle_data_table(body['experiment_id'],body['samples'])
     for plot in body["plot_types"]:
+        figs = []
         if plot.lower() == "radar":
-            figs, table = handle_radar_plot(body['experiment_id'],body['samples'])
-            for f in figs:
-                buffer = io.BytesIO()
-                f.savefig(buffer)
-                to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
-                arr.append(to_return)
+            figs = handle_radar_plot(body['experiment_id'],body['samples'],table)
+        elif plot.lower() == "bar":
+            figs = handle_bar_plot(body['experiment_id'],body['samples'],table)
+        elif plot.lower() == "linear":
+            figs = handle_linear_plot(body['experiment_id'],body['samples'],table)
+        for f in figs:
+            buffer = io.BytesIO()
+            f.savefig(buffer)
+            to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
+            arr.append(to_return)
     v = json.dumps(dict({
         "plots": arr,
         "raw_table": table
