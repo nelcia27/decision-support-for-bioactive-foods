@@ -82,7 +82,7 @@ def get_users(response):
     response_data = {}
     if response.method == "GET":
         user = get_user_model()
-        user_list = list(user.objects.values('username','email','is_staff'))
+        user_list = list(user.objects.values('username','email','is_staff','is_superuser'))
         not_superuser = []
         for i in range(len(user_list)):
             if user_list[i]['is_staff'] == False:
