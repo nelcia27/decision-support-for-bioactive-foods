@@ -108,8 +108,6 @@ def handle_radar_plot(experiment_id,sample_array,table):
         ef_set.add(s.externalFactor)
     if(len(ef_set)>1):
         raise AttributeError()
-    #pobranie "czystej tabeli" z danymi
-    table = handle_data_table(experiment_id,sample_array)
     keys = table.keys()
     ef = ef_set.pop()
     nval = ef.numberOfValues
