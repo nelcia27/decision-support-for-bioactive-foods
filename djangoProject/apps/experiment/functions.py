@@ -99,6 +99,7 @@ def handle_linear_plot(experiment_id,sample_array,table):
     to_return = []
     return to_return
 
+
 def handle_radar_plot(experiment_id,sample_array,table):
     #sprawdzenie czy próbki są z jednego czynnika zewnętrznego
     ef_set = set([])
@@ -111,11 +112,12 @@ def handle_radar_plot(experiment_id,sample_array,table):
     table = handle_data_table(experiment_id,sample_array)
     keys = table.keys()
     ef = ef_set.pop()
-    val = ef.numberOfValues
+    nval = ef.numberOfValues
+    val = ef.values.split(",")
     ret = []
     ymax = 0
     x = 0
-    for i in range(0,val):
+    for i in range(0,nval):
         x = 0
         fig = plt.figure(figsize=(7,7))
         for k in keys:
@@ -132,6 +134,7 @@ def handle_radar_plot(experiment_id,sample_array,table):
             pol = plt.polar(np.append(x,x[0]),y,'o-')
             pol[0].set_label("Próbka "+k)
         plt.xticks(x,etiq)
+        plt.title(ef.name+" ["+val[i]+" "+ef.unit+"]")
         ret.append(fig)
     rticks = np.linspace(0,ymax,num=int(ymax))
     for f in ret:

@@ -8,6 +8,7 @@ import xlsxwriter
 import json
 from .forms import UploadFileForm
 from .functions import handle_experiment_data, handle_radar_plot, handle_data_table, handle_bar_plot, handle_linear_plot
+
 from django.views.decorators.csrf import csrf_exempt
 from reportlab.pdfgen import canvas
 
@@ -195,6 +196,7 @@ def generatePlots(request):
             f.savefig(buffer)
             to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
             arr.append(to_return)
+
     v = json.dumps(dict({
         "plots": arr,
         "raw_table": table
