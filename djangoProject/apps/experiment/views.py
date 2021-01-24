@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .serializers import *
 from .models import *
+from fpdf import FPDF
 import io
 from django.http.response import HttpResponse, FileResponse
 import xlsxwriter
@@ -76,6 +77,97 @@ class ExperimentView(viewsets.ModelViewSet):
 class ResultView(viewsets.ModelViewSet):
     serializer_class = ResultSerializer
     queryset = Result.objects.all()
+
+class PDF(FPDF):
+
+    def header(self):
+        title = 'System wspomagania decyzji do projektowania i oceny zywnosci bioaktywnej'
+        # Arial bold 15
+        self.set_font('Times', 'B', 16)
+        # Calculate width of title and position
+        w = self.get_string_width(title) + 6
+        self.set_x((210 - w) / 2)
+        # Colors of frame, background and text
+        # self.set_draw_color(0, 80, 180)
+        self.set_draw_color(255, 255, 255)
+        # self.set_fill_color(230, 230, 0)
+        self.set_fill_color(255, 255, 255)
+        # self.set_text_color(220, 50, 50)
+        self.set_text_color(0, 0, 0)
+        # Thickness of frame (1 mm)
+        self.set_line_width(1)
+        # Title
+        self.cell(w, 9, title, 1, 1, 'C', 1)
+        # Line break
+        self.ln(10)
+
+    def footer(self):
+        # Position at 1.5 cm from bottom
+        self.set_y(-15)
+        # Arial italic 8
+        self.set_font('Arial', 'I', 8)
+        # Text color in gray
+        self.set_text_color(128)
+        # Page number
+        self.cell(0, 10, 'Page ' + str(self.page_no()), 0, 0, 'C')
+
+    def chapter_title(self, num, label):
+        # Arial 12
+        self.set_font('Times', '', 14)
+        # Background color
+        self.set_fill_color(200, 220, 255)
+        # Title
+        self.cell(0, 6, 'Chapter %d : %s' % (num, label), 0, 1, 'L', 1)
+        # Line break
+        self.ln(4)
+
+    def chapter_body(self, num, name):
+        self.set_font('Times', '', 12)
+        if (num == 1):
+            txt = name
+            self.multi_cell(0, 5, txt, 0)
+            self.ln()
+        elif (num == 2 or num == 3):
+            for txt in name:
+                self.cell(0, 6, '- ' + txt, 0, ln=1)
+            self.ln()
+        elif (num == 4):
+            for x in range(4):
+                for y in range(5):
+                    self.cell(30, 6, str(x) + 'x' + str(y), 1, ln=0)
+                self.ln()
+            self.ln()
+            for x in range(6):
+                for y in range(4):
+                    self.cell(30, 6, str(x) + 'x' + str(y) + 'a', 1, ln=0)
+                self.ln()
+            self.ln()
+            for x in range(4):
+                for y in range(6):
+                    self.cell(30, 6, str(x) + 'x' + str(y) + 'b', 1, ln=0)
+                self.ln()
+            self.ln()
+        elif (num == 5):
+            a = True
+            #self.image('ikona.png')
+        elif (num == 6):
+            self.set_font('Times', 'U', 12)
+            self.set_text_color(32, 32, 255)
+            for txt in name:
+                self.cell(0, 6, '- ' + txt, 0, ln=1)
+
+    def lines(self):
+        self.set_line_width(0.4)
+        self.line(5.0, 5.0, 205.0, 5.0)  # top one
+        self.line(5.0, 292.0, 205.0, 292.0)  # bottom one
+        self.line(5.0, 5.0, 5.0, 292.0)  # left one
+        self.line(205.0, 5.0, 205.0, 292.0)  # right one
+
+    def print_chapter(self, num, title, name):
+        # self.add_page()
+        self.lines()
+        self.chapter_title(num, title)
+        self.chapter_body(num, name)
 
 
 #metrices list of lists of elements ['name','num_series', 'num_repeats', 'id_próbki', 'num_of_values_external_factor', 'list_of_values_external_factor', 'metrice_id']
@@ -160,6 +252,27 @@ def read_experiment_data_from_xlsx(request):
 
 @csrf_exempt
 def generatePDF(request):
+    title = 'System wspomagania decyzji do projektowania i oceny zywnosci bioaktywnej'
+    ch1 = 'Opis'
+    ch2 = 'Receptura'
+    ch3 = 'Mierzone cechy'
+    ch4 = 'Tabele'
+    ch5 = 'Wizualizacja'
+    ch6 = 'Linki'
+
+    pdf = PDF()
+    pdf.set_title(title)
+    pdf.set_author('Zespol 4')
+    pdf.add_page()
+    pdf.print_chapter(1, ch1,
+                      'Przygotowanie systemu do wspomagania analizy wynikow eksperymentów w zakresie receptur i technologii wytwarzania zywnosci bioaktywnej.')
+    pdf.print_chapter(2, ch2, ['Maka Poznanska', 'Jajka', 'Woda', 'Sol'])
+    pdf.print_chapter(3, ch3, ['Zujnosc', 'Twardosc', 'Wilgotnosc', 'Chrupkosc'])
+    pdf.print_chapter(4, ch4, '')
+    pdf.print_chapter(5, ch5, '')
+    pdf.print_chapter(6, ch6, ['https://www.facebook.com/'])
+
+    pdf.output('Eksperyment.pdf', 'F')
     buffer = io.BytesIO()
 
     p = canvas.Canvas(buffer)
@@ -171,7 +284,6 @@ def generatePDF(request):
 
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
-
 
 @csrf_exempt
 def generatePlots(request):
