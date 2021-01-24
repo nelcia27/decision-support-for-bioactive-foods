@@ -176,8 +176,9 @@ def generatePDF(request):
 def generatePlots(request):
     #{
     #   experiment_id:__,
-    #   samples:[_],
-    #   plot_types:[__,__]
+    #   samples:[_], TYPE  ARRAY OF TYPE LIKE Sample.id
+    #   plot_types:[__,__] TYPE ARRAY OF STRING,
+    #   metrics:[] TYPE ARRAY OF TYPE LIKE Metrics.name
     #}
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
@@ -190,7 +191,7 @@ def generatePlots(request):
         elif plot.lower() == "bar":
             figs = handle_bar_plot(body['experiment_id'],body['samples'],table)
         elif plot.lower() == "linear":
-            figs = handle_linear_plot(body['experiment_id'],body['samples'],table)
+            figs = handle_linear_plot(body['experiment_id'],body['samples'])
         for f in figs:
             buffer = io.BytesIO()
             f.savefig(buffer)

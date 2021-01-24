@@ -49,48 +49,6 @@ def handle_experiment_data(file):
                     r = Result(value=res[1][i][j], numberOfRepeat=j + 1, numberOfSeries=i + 1, detailedMetric_id=res[0], experiment_id=experimentId)
                     r.save()
 
-def handle_data_table(experiment_id,sample_array):
-    ef_set = set([])
-    dm_res_dict = dict()
-    table = dict()
-    #pobranie rezultatów
-    results = Result.objects.filter(experiment=experiment_id)
-    samples = []
-    #przefiltrowanie, czy próbki były pod wpływem jednego czynnika za pomocą ef_set
-    for id in sample_array:
-        s = Sample.objects.get(id=id)
-        ef_set.add(s.externalFactor)
-        samples.append(s)
-        table[str(s.id)] = []
-    if(len(ef_set)>1):
-        raise AttributeError()
-    #zebranie wyników o jednej metryce do jednej tablicy
-    for r in results:
-        try:
-            dm_res_dict[str(r.detailedMetric)]
-        except KeyError as identifier:
-            dm_res_dict[str(r.detailedMetric.id)] = []
-        dm_res_dict[str(r.detailedMetric.id)].append((r.numberOfRepeat,r.numberOfSeries, r.value.split(",")))
-    keys = dm_res_dict.keys()
-    #wygenerowanie tablicy
-    for k in keys:
-        dm = DetailedMetrics.objects.get(id=k)
-        if not(dm.sample.id in sample_array):
-            continue
-        #nagłówek składa się z id próbki, danych o metryce, liczby serii i powtórzeń
-        arr = []
-        for r in dm_res_dict[k]:
-            arr_in = []
-            for n in r[2]:
-                arr_in.append(float(n))
-            arr.append(arr_in)
-        table[str(dm.sample.id)].append((dm.metric.name+" - "+dm.metric.unit, dm.numberOfSeries, dm.numberOfRepeat, arr))
-    keys = table.keys()
-    sortfunc = lambda x : x[0]
-    for k in keys:
-        table[k].sort(key=sortfunc)
-    return table
-
 def check_ef_samples(sample_array):
     ef_set = set([])
     for id in sample_array:
@@ -100,6 +58,42 @@ def check_ef_samples(sample_array):
         raise AttributeError()
     ef = ef_set.pop()
     return ef
+
+def handle_data_table(experiment_id,sample_array, m_array):
+    dm_res_dict = dict()
+    #pobranie rezultatów
+    results = Result.objects.filter(experiment=experiment_id)
+    #przefiltrowanie, czy próbki były pod wpływem jednego czynnika za pomocą ef_set
+    check_ef_samples(sample_array)
+    #zebranie wyników o jednej metryce do jednej tablicy
+    for r in results:
+        if not (r.detailedMetric.sample.id in sample_array and r.detailedMetric.metric.name in m_array):
+            continue
+        try:
+            dm_res_dict[str(r.detailedMetric)]
+        except KeyError as identifier:
+            dm_res_dict[str(r.detailedMetric.id)] = []
+        arr = []
+        for a in r.value.split(","):
+            arr.append(float(a))
+        dm_res_dict[str(r.detailedMetric.id)].append((r.numberOfRepeat,r.numberOfSeries, arr))
+    keys = dm_res_dict.keys()
+    #wygenerowanie tablicy
+    table = dict()
+    for k in keys:
+        dm = DetailedMetrics.objects.get(id=k)
+        if not(dm.sample.id in sample_array):
+            continue
+        #nagłówek składa się z id próbki, danych o metryce, liczby serii i powtórzeń
+        arr = []
+        for r in dm_res_dict[k]:
+            arr.append(r[2])
+        table[str(dm.sample.id)].append(((dm.metric.name,dm.metric.unit), dm.numberOfSeries, dm.numberOfRepeat, arr))
+    keys = table.keys()
+    sortfunc = lambda x : x[0]
+    for k in keys:
+        table[k].sort(key=sortfunc)
+    return table
 
 def handle_bar_plot(experiment_id,sample_array,table):
     ef = check_ef_samples(sample_array)
@@ -111,7 +105,7 @@ def handle_bar_plot(experiment_id,sample_array,table):
     keys = table.keys()
     for k in keys:
         for v in table[k]:
-            met_set.add(v[0])
+            met_set.add(v[0][0]+ " - "+v[0][1])
     for met in met_set:
         met_dict[met]=[]
     for met in met_set:
@@ -150,8 +144,59 @@ def handle_bar_plot(experiment_id,sample_array,table):
         ax.legend()
     return to_return
 
-def handle_linear_plot(experiment_id,sample_array,table):
-    to_return = []
+def handle_linear_plot(experiment_id,sample_array, m_array):
+    dm_res_dict = dict()
+    to_return=[]
+    #pobranie rezultatów
+    results = Result.objects.filter(experiment=experiment_id)
+    #przefiltrowanie, czy próbki były pod wpływem jednego czynnika za pomocą ef_set
+    ef = check_ef_samples(sample_array)
+    #zebranie wyników o jednej metryce do jednej tablicy
+    for r in results:
+        if not (r.detailedMetric.sample.id in sample_array and r.detailedMetric.metric.name in m_array) :
+            continue
+        try:
+            dm_res_dict[str(r.detailedMetric.id)]
+        except KeyError as identifier:
+            dm_res_dict[str(r.detailedMetric.id)] = []
+        arr = []
+        for r in r.value.split(','):
+            arr.append(r[2])
+        dm_res_dict[str(r.detailedMetric.id)].append((r.numberOfRepeat,r.numberOfSeries, arr))
+    keys = dm_res_dict.keys()
+    met_res_dict = dict()
+    for m in m_array:
+        met_res_dict[m] = []
+    for k in keys:
+        dm = DetailedMetrics.objects.get(id=k)
+        ser_dict = dict()
+        for i in range(1,dm.numberOfSeries+1):
+            ser_dict[i] = []
+        for v in dm_res_dict[k]:
+            ser_dict[v[1]].append(v[2])
+        met_res_dict[dm.metric.name].append((dm.sample,ser_dict))
+    xTemplate = [] 
+    for v in ef.values.split(","):
+        xTemplate.append(float(v))
+    for m in m_array:
+        fig, ax = plt.subplots(figsize=(7,7))
+        for p in met_res_dict[m]:
+            series = p[1].keys()
+            ydata = []
+            xdata = []
+            for s in series:
+                ydata.append(p[1][s])
+                xdata.append(xTemplate)
+            lines = ax.plot(np.array(xdata).transpose(),np.array(ydata).transpose(), marker="o")
+            sup = p[0].supplement.all()
+            lab = ""
+            for s in sup:
+                lab+=s.name+", "
+            lab =lab[:(len(lab)-2)]
+            for s in series:
+                lines[s].set_label("Seria "+str(s)+" - "+lab)
+        ax.legend()
+        to_return.append(fig)
     return to_return
 
 
@@ -170,12 +215,14 @@ def handle_radar_plot(experiment_id,sample_array,table):
             etiq = []
             y = []
             for pack in table[k]:
-                etiq.append(pack[0])
-                tmp = np.mean(np.transpose(np.array(pack[3]))[i])
+                etiq.append(pack[0][0]+" - "+pack[0][1])
+                arr = np.transpose(np.array(pack[3]))
+                vmax=np.max()
+                tmp = np.mean(arr[i])/vmax
                 y.append(tmp)
                 if ymax < tmp:
                     ymax=tmp
-            x = np.linspace(start=0,stop=360,num=len(etiq)) /180 * np.pi
+            x = np.linspace(start=0,stop=2*np.pi,num=len(etiq)) /180 * np.pi
             y+=y[:1]
             pol = plt.polar(np.append(x,x[0]),y,'o-')
             sup = Sample.objects.get(id=k).supplement.all()
