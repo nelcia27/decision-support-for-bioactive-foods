@@ -91,8 +91,63 @@ def handle_data_table(experiment_id,sample_array):
         table[k].sort(key=sortfunc)
     return table
 
+def check_ef_samples(sample_array):
+    ef_set = set([])
+    for id in sample_array:
+        s = Sample.objects.get(id=id)
+        ef_set.add(s.externalFactor)
+    if(len(ef_set)>1):
+        raise AttributeError()
+    ef = ef_set.pop()
+    return ef
+
 def handle_bar_plot(experiment_id,sample_array,table):
+    ef = check_ef_samples(sample_array)
+    met_set = set()
+    val = ef.values.split(",")
+    axs = []
     to_return = []
+    met_dict = dict()
+    keys = table.keys()
+    for k in keys:
+        for v in table[k]:
+            met_set.add(v[0])
+    for met in met_set:
+        met_dict[met]=[]
+    for met in met_set:
+        for k in keys:
+            arr = []
+            for v in table[k]:
+                if v[0]==met:
+                    arr.append(v[3])
+            met_dict[met].append((k,arr))
+    xticks = np.arange(0,len(val))
+    width = 0.5/len(met_set)
+    keys = met_dict.keys()
+    for k in keys:
+        fig, ax = plt.subplots(figsize=(9,6))
+        ax.set_title(k)
+        to_return.append(fig)
+        axs.append(ax)
+        ax.set_xticks(xticks)
+        ax.set_xlabel(ef.name+" ["+ef.unit+"]")
+        ax.set_xticklabels(val)
+        i = 0
+        for pair in met_dict[k]:
+            tmp = np.transpose(np.array(pair[1]))
+            yt = []
+
+            for x in xticks:
+                yt.append(np.mean(tmp[x]))
+            bar_sub =ax.bar(xticks+i*width,yt,align='edge',width=width)
+            sup = Sample.objects.get(id=pair[0]).supplement.all()
+            lab = ""
+            for s in sup:
+                lab+=s.name+", "
+            lab =lab[:(len(lab)-2)]
+            bar_sub.set_label(lab)
+            i+=1
+        ax.legend()
     return to_return
 
 def handle_linear_plot(experiment_id,sample_array,table):
@@ -101,15 +156,8 @@ def handle_linear_plot(experiment_id,sample_array,table):
 
 
 def handle_radar_plot(experiment_id,sample_array,table):
-    #sprawdzenie czy próbki są z jednego czynnika zewnętrznego
-    ef_set = set([])
-    for id in sample_array:
-        s = Sample.objects.get(id=id)
-        ef_set.add(s.externalFactor)
-    if(len(ef_set)>1):
-        raise AttributeError()
+    ef = check_ef_samples(sample_array)
     keys = table.keys()
-    ef = ef_set.pop()
     nval = ef.numberOfValues
     val = ef.values.split(",")
     ret = []
@@ -130,7 +178,12 @@ def handle_radar_plot(experiment_id,sample_array,table):
             x = np.linspace(start=0,stop=360,num=len(etiq)) /180 * np.pi
             y+=y[:1]
             pol = plt.polar(np.append(x,x[0]),y,'o-')
-            pol[0].set_label("Próbka "+k)
+            sup = Sample.objects.get(id=k).supplement.all()
+            lab = ""
+            for s in sup:
+                lab+=s.name+", "
+            lab =lab[:(len(lab)-2)]
+            pol[0].set_label(lab)
         plt.xticks(x,etiq)
         plt.title(ef.name+" ["+val[i]+" "+ef.unit+"]")
         ret.append(fig)
