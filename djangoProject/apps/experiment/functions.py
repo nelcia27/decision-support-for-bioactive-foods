@@ -91,8 +91,15 @@ def handle_data_table(experiment_id,sample_array, m_array):
         table[str(dm.sample.id)].append(((dm.metric.name,dm.metric.unit), dm.numberOfSeries, dm.numberOfRepeat, arr))
     keys = table.keys()
     sortfunc = lambda x : x[0]
+    dms = 0
     for k in keys:
+        dms = len(table[k])
+        break
+    for k in keys:
+        if (len(table[k])!=dms):
+            raise AttributeError()
         table[k].sort(key=sortfunc)
+    
     return table
 
 def handle_bar_plot(experiment_id,sample_array,table):
@@ -217,8 +224,7 @@ def handle_radar_plot(experiment_id,sample_array,table):
             for pack in table[k]:
                 etiq.append(pack[0][0]+" - "+pack[0][1])
                 arr = np.transpose(np.array(pack[3]))
-                vmax=np.max()
-                tmp = np.mean(arr[i])/vmax
+                tmp = np.mean(arr[i])
                 y.append(tmp)
                 if ymax < tmp:
                     ymax=tmp

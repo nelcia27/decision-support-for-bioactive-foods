@@ -184,6 +184,7 @@ def generatePlots(request):
     body = json.loads(body_unicode)
     arr = []
     table = handle_data_table(body['experiment_id'],body['samples'])
+    
     for plot in body["plot_types"]:
         figs = []
         if plot.lower() == "radar":
@@ -194,7 +195,7 @@ def generatePlots(request):
             figs = handle_linear_plot(body['experiment_id'],body['samples'])
         for f in figs:
             buffer = io.BytesIO()
-            f.savefig(buffer)
+            f.savefig(buffer, format='png')
             to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
             arr.append(to_return)
 
