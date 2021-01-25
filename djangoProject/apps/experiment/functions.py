@@ -88,7 +88,10 @@ def handle_data_table(experiment_id,sample_array, m_array):
         arr = []
         for r in dm_res_dict[k]:
             arr.append(r[2])
-        table[str(dm.sample.id)].append(((dm.metric.name,dm.metric.unit), dm.numberOfSeries, dm.numberOfRepeat, arr))
+        try:
+            table[str(dm.sample.id)].append(((dm.metric.name,dm.metric.unit), dm.numberOfSeries, dm.numberOfRepeat, arr))
+        except KeyError as identifier:
+            table[str(dm.sample.id)]=[((dm.metric.name,dm.metric.unit), dm.numberOfSeries, dm.numberOfRepeat, arr)]
     keys = table.keys()
     sortfunc = lambda x : x[0]
     dms = 0
@@ -119,14 +122,14 @@ def handle_bar_plot(experiment_id,sample_array,table):
         for k in keys:
             arr = []
             for v in table[k]:
-                if v[0]==met:
+                if (v[0][0]+ " - "+v[0][1])==met:
                     arr.append(v[3])
             met_dict[met].append((k,arr))
     xticks = np.arange(0,len(val))
-    width = 0.5/len(met_set)
+    width = 0.7/len(met_set)
     keys = met_dict.keys()
     for k in keys:
-        fig, ax = plt.subplots(figsize=(9,6))
+        fig, ax = plt.subplots(figsize=(11,7))
         ax.set_title(k)
         to_return.append(fig)
         axs.append(ax)
@@ -155,7 +158,7 @@ def handle_linear_plot(experiment_id,sample_array, m_array):
     dm_res_dict = dict()
     to_return=[]
     #pobranie rezultatów
-    results = Result.objects.filter(experiment=experiment_id)
+    results = Result.objects.filter(experiment=experiment_id).all()
     #przefiltrowanie, czy próbki były pod wpływem jednego czynnika za pomocą ef_set
     ef = check_ef_samples(sample_array)
     #zebranie wyników o jednej metryce do jednej tablicy
@@ -167,8 +170,8 @@ def handle_linear_plot(experiment_id,sample_array, m_array):
         except KeyError as identifier:
             dm_res_dict[str(r.detailedMetric.id)] = []
         arr = []
-        for r in r.value.split(','):
-            arr.append(r[2])
+        for q in r.value.split(','):
+            arr.append(float(q))
         dm_res_dict[str(r.detailedMetric.id)].append((r.numberOfRepeat,r.numberOfSeries, arr))
     keys = dm_res_dict.keys()
     met_res_dict = dict()
@@ -186,22 +189,30 @@ def handle_linear_plot(experiment_id,sample_array, m_array):
     for v in ef.values.split(","):
         xTemplate.append(float(v))
     for m in m_array:
-        fig, ax = plt.subplots(figsize=(7,7))
+        fig, ax = plt.subplots(figsize=(11,7))
+        unit = str(Metrics.objects.get(name=m).unit)
+        ax.set_ylabel(m+" - "+unit)
+        ax.set_xlabel(ef.name+" ["+ef.unit+"]")
         for p in met_res_dict[m]:
             series = p[1].keys()
-            ydata = []
             xdata = []
+            ydata = []
             for s in series:
-                ydata.append(p[1][s])
+                mean_table =np.zeros((len(xTemplate)))
+                for v in p[1][s]:
+                    mean_table+= np.array(v)
+                ydata.append(mean_table/len(xTemplate))
                 xdata.append(xTemplate)
-            lines = ax.plot(np.array(xdata).transpose(),np.array(ydata).transpose(), marker="o")
+            xdata = np.array(xdata).transpose()
+            ydata = np.array(ydata).transpose()
+            lines = ax.plot(xdata,ydata, marker="o")
             sup = p[0].supplement.all()
             lab = ""
             for s in sup:
                 lab+=s.name+", "
             lab =lab[:(len(lab)-2)]
             for s in series:
-                lines[s].set_label("Seria "+str(s)+" - "+lab)
+                lines[s-1].set_label("Seria "+str(s)+" - "+lab)
         ax.legend()
         to_return.append(fig)
     return to_return
@@ -217,7 +228,7 @@ def handle_radar_plot(experiment_id,sample_array,table):
     x = 0
     for i in range(0,nval):
         x = 0
-        fig = plt.figure(figsize=(7,7))
+        fig = plt.figure(figsize=(11,7))
         for k in keys:
             etiq = []
             y = []
@@ -228,7 +239,7 @@ def handle_radar_plot(experiment_id,sample_array,table):
                 y.append(tmp)
                 if ymax < tmp:
                     ymax=tmp
-            x = np.linspace(start=0,stop=2*np.pi,num=len(etiq)) /180 * np.pi
+            x = np.linspace(start=0,stop=np.pi,num=len(etiq))
             y+=y[:1]
             pol = plt.polar(np.append(x,x[0]),y,'o-')
             sup = Sample.objects.get(id=k).supplement.all()
@@ -240,7 +251,7 @@ def handle_radar_plot(experiment_id,sample_array,table):
         plt.xticks(x,etiq)
         plt.title(ef.name+" ["+val[i]+" "+ef.unit+"]")
         ret.append(fig)
-    rticks = np.linspace(0,ymax,num=int(ymax))
+    rticks = np.linspace(0,ymax,num=4)
     for f in ret:
         for ax in f.get_axes():
             ax.set_rticks(rticks)

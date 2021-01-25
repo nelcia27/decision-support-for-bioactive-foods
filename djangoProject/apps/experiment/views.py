@@ -183,7 +183,7 @@ def generatePlots(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
     arr = []
-    table = handle_data_table(body['experiment_id'],body['samples'])
+    table = handle_data_table(body['experiment_id'],body['samples'],body['metrics'])
     
     for plot in body["plot_types"]:
         figs = []
@@ -192,7 +192,7 @@ def generatePlots(request):
         elif plot.lower() == "bar":
             figs = handle_bar_plot(body['experiment_id'],body['samples'],table)
         elif plot.lower() == "linear":
-            figs = handle_linear_plot(body['experiment_id'],body['samples'])
+            figs = handle_linear_plot(body['experiment_id'],body['samples'],body['metrics'])
         for f in figs:
             buffer = io.BytesIO()
             f.savefig(buffer, format='png')
