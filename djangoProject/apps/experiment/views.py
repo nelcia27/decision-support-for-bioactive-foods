@@ -11,6 +11,8 @@ from .functions import handle_experiment_data, handle_radar_plot, handle_data_ta
 
 from django.views.decorators.csrf import csrf_exempt
 from reportlab.pdfgen import canvas
+from PIL import Image
+from .functions import stats_data
 
 class CategoryView(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -208,3 +210,50 @@ def generatePlots(request):
     response.write(v)
     return response
 
+@csrf_exempt
+def generateStats(request):
+    response_data = {}
+    if request.method == "POST":
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        name = body['experiment_id']
+        try:
+            experiment_results = Result.objects.filter(experiment_id=name)
+        except:
+            response_data['message'] = 'result nie istnieje'
+            response = HttpResponse(json.dumps(response_data))
+            response.status_code = 400
+            return (response)
+        unique_series  = []
+        for i in range(len(experiment_results)):
+            if experiment_results[i].numberOfSeries not in unique_series:
+                unique_series.append(experiment_results[i].numberOfSeries)
+        values_series = {}
+        for i in range(len(unique_series)):
+            for j in range(len(experiment_results)):
+                if unique_series[i] == experiment_results[j].numberOfSeries:
+                    splitted_values = experiment_results[j].value.split(',')
+                    for s in range(len(splitted_values)):
+                        splitted_values[s] = float(splitted_values[s])
+                    if unique_series[i] not in values_series:
+                        values_series[unique_series[i]] = [len(splitted_values)]
+                        values_series[unique_series[i]].extend(splitted_values)
+
+                    else:
+                        values_series[unique_series[i]].extend(splitted_values)
+        if len(values_series.keys()) <1:
+            response_data['result'] = "brak wyników eksperymentów"
+        else:
+            mean_list,dev,all_mean,all_dev = stats_data(values_series)
+            response_data['result'] = "wykonano"
+            response_data['mean_series'] = mean_list
+            response_data['standard_devation'] = dev
+            response_data['mean'] = all_mean
+            response_data['all_dev'] = all_dev
+        response = HttpResponse(json.dumps(response_data))
+        response.status_code = 200
+        return response
+    response_data['result'] = "not POST"
+    response = HttpResponse(json.dumps(response_data))
+    response.status_code = 400
+    return response

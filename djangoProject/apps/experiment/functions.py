@@ -4,6 +4,8 @@ import io
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+import statistics
+
 def handle_experiment_data(file):
     wb = xlrd.open_workbook(file_contents=file.read())
     result = []
@@ -268,3 +270,33 @@ def handle_radar_plot(experiment_id,sample_array,table):
             ax.set_anchor('N')
             ax.legend(loc=8, ncol=len(keys)/5+1)
     return ret
+
+def stats_data(data):
+    all_values = []
+    for key in data.keys():
+        value_inside = [[] for i in range(data[key][0])]
+        lista = data[key]
+        for i in range(1,len(lista)):
+            value_inside[(i-1)%data[key][0]].append(lista[i])
+        all_values.append(value_inside)
+    mean_list = [[] for key in data.keys()]
+    dx = [[] for key in data.keys()]
+    for i in range(len(all_values)):
+        for j in range(len(all_values[i])):
+            mean = sum(all_values[i][j])/len(all_values[i][j])
+            deviation = statistics.stdev(all_values[i][j])
+            mean_list[i].append(mean)
+            dx[i].append(deviation)
+    all_mean = []
+    all_dx = []
+    series_values = [[] for i in mean_list[0]]
+    for g in range(len(mean_list)):
+        for p in range(len(mean_list[g])):
+            series_values[p].append(mean_list[g][p])
+    for i in range(len(series_values)):
+        mean = sum(series_values[i])/len(series_values[i])
+        deviation = statistics.stdev(series_values[i])
+        all_mean.append(mean)
+        all_dx.append(deviation)
+    return mean_list,dx,all_mean,all_dx
+
