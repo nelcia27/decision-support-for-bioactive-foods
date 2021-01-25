@@ -127,26 +127,39 @@ class PDF(FPDF):
             txt = name
             self.multi_cell(0, 5, txt, 0)
             self.ln()
-        elif (num == 2 or num == 3):
+        elif (num == 2):
+            self.set_font(family='Times', style='B')
+            self.multi_cell(0, 6, 'Podstawa:', 0)
+            self.set_font(family='Times', style='')
+            for txt in name[0]:
+                self.multi_cell(0, 6, '- ' + txt, 0)
+            self.ln()
+            self.set_font(family='Times', style='B')
+            self.multi_cell(0, 6, 'Dodatki:', 0)
+            self.set_font(family='Times', style='')
+            for txt in name[1]:
+                self.multi_cell(0, 6, '- ' + txt, 0)
+            self.ln()
+        elif (num == 3):
             for txt in name:
-                self.cell(0, 6, '- ' + txt, 0, ln=1)
+                self.multi_cell(0, 6, '- ' + txt, 0)
             self.ln()
         elif (num == 4):
-            for x in range(4):
-                for y in range(5):
-                    self.cell(30, 6, str(x) + 'x' + str(y), 1, ln=0)
+            series_num = 1
+            for x in name:
+                self.cell(30, 6, ' ', 0, ln=0)
+                self.cell(30 * len(x[0]), 6, 'Seria ' + str(series_num), 1, ln=0)
                 self.ln()
+                measuer_num = 1
+                for y in x:
+                    self.cell(30, 6, 'Pomiar ' + str(measuer_num), 1, ln=0)
+                    for z in y:
+                        self.cell(30, 6, str(z), 1, ln=0)
+                    self.ln()
+                    measuer_num += 1
+                series_num += 1
             self.ln()
-            for x in range(6):
-                for y in range(4):
-                    self.cell(30, 6, str(x) + 'x' + str(y) + 'a', 1, ln=0)
-                self.ln()
-            self.ln()
-            for x in range(4):
-                for y in range(6):
-                    self.cell(30, 6, str(x) + 'x' + str(y) + 'b', 1, ln=0)
-                self.ln()
-            self.ln()
+
         elif (num == 5):
             a = True
             #self.image('ikona.png')
@@ -251,7 +264,12 @@ def read_experiment_data_from_xlsx(request):
 
 
 @csrf_exempt
-def generatePDF(request):
+def generatePDF(response):
+    response_data = {}
+    body_unicode = response.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    id_exp = body['idExp']
+    experiment = Experiment.objects.get(id=id_exp)
     title = 'System wspomagania decyzji do projektowania i oceny zywnosci bioaktywnej'
     ch1 = 'Opis'
     ch2 = 'Receptura'
@@ -264,15 +282,43 @@ def generatePDF(request):
     pdf.set_title(title)
     pdf.set_author('Zespol 4')
     pdf.add_page()
-    pdf.print_chapter(1, ch1,
-                      'Przygotowanie systemu do wspomagania analizy wynikow eksperymentów w zakresie receptur i technologii wytwarzania zywnosci bioaktywnej.')
-    pdf.print_chapter(2, ch2, ['Maka Poznanska', 'Jajka', 'Woda', 'Sol'])
-    pdf.print_chapter(3, ch3, ['Zujnosc', 'Twardosc', 'Wilgotnosc', 'Chrupkosc'])
-    pdf.print_chapter(4, ch4, '')
+    tmp = []
+    suplements_ing = []
+    basic_ing = []
+    for item in experiment.product.recipe.ingredients.all():
+        tmp.append([item.basicIngredientBase.name, item.percentage])
+    for item in experiment.detailedMetrics.all():
+        for item2 in item.sample.supplement.all():
+            for x in range(len(tmp)):
+                if tmp[x][0] == item2.basicIngredientBase.name:
+                    tmp[x][1] -= item2.percentage
+            suplements_ing.append(item2.name + " | zamiast: "+item2.basicIngredientBase.name)
+    for x in tmp:
+        basic_ing.append(str(x[0]) + " " + str(x[1]) + "%")
+
+    result = Result.objects.filter(experiment=experiment)
+    f = []
+    tab = []
+    for i in result:
+        print(i.detailedMetric.sample.externalFactor.numberOfValues)
+        for x in range(i.detailedMetric.numberOfSeries):
+            tmp1 = []
+            for y in range(i.detailedMetric.numberOfRepeat):
+                tmp1.append("X")
+            tab.append(tmp1)
+        break
+
+    for i in result:
+        tab[i.numberOfSeries-1][i.numberOfRepeat-1] = i.value.split(",")
+    pdf.print_chapter(1, ch1, str(experiment.description))
+    pdf.print_chapter(2, ch2, [basic_ing, suplements_ing])
+    pdf.print_chapter(3, ch3, [experiment.name])
+    pdf.print_chapter(4, ch4, tab)
     pdf.print_chapter(5, ch5, '')
-    pdf.print_chapter(6, ch6, ['https://www.facebook.com/'])
+    pdf.print_chapter(6, ch6, [str(experiment.link)])
 
     pdf.output('Eksperyment.pdf', 'F')
+
     buffer = io.BytesIO()
 
     p = canvas.Canvas(buffer)
