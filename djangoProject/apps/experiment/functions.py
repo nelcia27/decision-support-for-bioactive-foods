@@ -226,6 +226,16 @@ def handle_radar_plot(experiment_id,sample_array,table):
     ret = []
     ymax = 0
     x = 0
+    met_max = dict()
+    for k in keys:
+        for v in table[k]:
+            ymax = np.max(v[3])
+            try:
+                if ymax> met_max[v[0][0]]:
+                    met_max[v[0][0]] = ymax
+            except KeyError as i:
+                met_max[v[0][0]] = ymax
+    ymax = 0
     for i in range(0,nval):
         x = 0
         fig = plt.figure(figsize=(11,7))
@@ -235,7 +245,7 @@ def handle_radar_plot(experiment_id,sample_array,table):
             for pack in table[k]:
                 etiq.append(pack[0][0]+" - "+pack[0][1])
                 arr = np.transpose(np.array(pack[3]))
-                tmp = np.mean(arr[i])
+                tmp = np.mean(arr[i])/met_max[pack[0][0]]
                 y.append(tmp)
                 if ymax < tmp:
                     ymax=tmp
