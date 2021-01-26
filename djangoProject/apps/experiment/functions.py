@@ -109,125 +109,99 @@ def handle_data_table(experiment_id,sample_array, m_array):
     
     return table
 
-def handle_bar_plot(experiment_id,sample_array,table):
-    ef = check_ef_samples(sample_array)
+def handle_bar_plot(table,body):
+    sample_array = []
     met_set = set()
-    val = ef.values.split(",")
+    for p in body['series_metric']:
+        dm = DetailedMetrics.objects.get(id=p[1])
+        sample_array.append(dm.sample.id)
+        met_set.add(dm.metric)
+    if (len(met_set)>1):
+         raise AttributeError()
+    ef = check_ef_samples(sample_array)
+    val = []
+    for v in ef.values.split(","):
+        val.append(float(v))
+    nval = len(val)
+    width = val[0]*0.8/len(sample_array)
     axs = []
     to_return = []
-    met_dict = dict()
-    keys = table.keys()
-    for k in keys:
-        for v in table[k]:
-            met_set.add(v[0][0]+ " - "+v[0][1])
-    for met in met_set:
-        met_dict[met]=[]
-    for met in met_set:
-        for k in keys:
-            arr = []
-            for v in table[k]:
-                if (v[0][0]+ " - "+v[0][1])==met:
-                    arr.append(v[3])
-            met_dict[met].append((k,arr))
-    xticks = np.arange(0,len(val))
-    width = 1.5/len(met_set)
-    keys = met_dict.keys()
-    for k in keys:
-        fig, ax = plt.subplots(figsize=(11,7))
-        ax.set_ylabel(k)
-        to_return.append(fig)
-        axs.append(ax)
-        ax.set_xticks(xticks)
-        ax.set_xlabel(ef.name+" ["+ef.unit+"]")
-        ax.set_xticklabels(val)
-        i=0
-        for pair in met_dict[k]:
-            tmp = np.transpose(np.array(pair[1]))
-            yt = []
-
-            for x in xticks:
-                yt.append(np.mean(tmp[x]))
-            bar_sub =ax.bar(xticks+i*width,yt,align='edge',width=width)
-            sup = Sample.objects.get(id=pair[0]).supplement.all()
-            lab = ""
-            for s in sup:
-                lab+=s.name+", "
-            lab =lab[:(len(lab)-2)]
-            bar_sub.set_label(lab)
-            i+=1
-        ax.legend()
+    metric = met_set.pop()
+    fig = plt.figure(figsize=(11,7))
+    ax = fig.gca()
+    ax.set_xticks(val)
+    x = np.array(val)
+    i = -len(sample_array)/2
+    for b in body['series_metric']:
+        ind = table['series_metric'].index(b)
+        dm = DetailedMetrics.objects.get(id=b[1])
+        data = table['mean_series'][ind]
+        err = table['error_bars'][ind]
+        line = ax.bar(x+i*width,data,yerr=err, width=width, align='edge')
+        sup = dm.sample.supplement.all()
+        lab = "Seria "+str(b[0])+" - "
+        for s in sup:
+            lab+=s.name+", "
+        lab = lab[:(len(lab)-2)]
+        line.set_label(lab)
+        i+=1
+    ax.set_ylabel(metric.name + " - " + metric.unit)
+    ax.set_xlabel(ef.name + " - " + ef.unit)
+    ax.legend()
+    to_return.append(fig)
+    
     return to_return
 
-def handle_linear_plot(experiment_id,sample_array, m_array):
-    dm_res_dict = dict()
-    to_return=[]
-    #pobranie rezultatów
-    results = Result.objects.filter(experiment=experiment_id).all()
-    #przefiltrowanie, czy próbki były pod wpływem jednego czynnika za pomocą ef_set
+def handle_linear_plot(table,body):
+    sample_array = []
+    met_set = set()
+    for p in body['series_metric']:
+        dm = DetailedMetrics.objects.get(id=p[1])
+        sample_array.append(dm.sample.id)
+        met_set.add(dm.metric)
+    if (len(met_set)>1):
+        raise AttributeError()
     ef = check_ef_samples(sample_array)
-    #zebranie wyników o jednej metryce do jednej tablicy
-    for r in results:
-        if not (r.detailedMetric.sample.id in sample_array and r.detailedMetric.metric.name in m_array) :
-            continue
-        try:
-            dm_res_dict[str(r.detailedMetric.id)]
-        except KeyError as identifier:
-            dm_res_dict[str(r.detailedMetric.id)] = []
-        arr = []
-        for q in r.value.split(','):
-            arr.append(float(q))
-        dm_res_dict[str(r.detailedMetric.id)].append((r.numberOfRepeat,r.numberOfSeries, arr))
-    keys = dm_res_dict.keys()
-    met_res_dict = dict()
-    for m in m_array:
-        met_res_dict[m] = []
-    for k in keys:
-        dm = DetailedMetrics.objects.get(id=k)
-        ser_dict = dict()
-        for i in range(1,dm.numberOfSeries+1):
-            ser_dict[i] = []
-        for v in dm_res_dict[k]:
-            ser_dict[v[1]].append(v[2])
-        met_res_dict[dm.metric.name].append((dm.sample,ser_dict))
-    xTemplate = [] 
+    val = []
     for v in ef.values.split(","):
-        xTemplate.append(float(v))
-    for m in m_array:
-        fig, ax = plt.subplots(figsize=(11,7))
-        unit = str(Metrics.objects.get(name=m).unit)
-        ax.set_ylabel(m+" - "+unit)
-        ax.set_xlabel(ef.name+" ["+ef.unit+"]")
-        for p in met_res_dict[m]:
-            series = p[1].keys()
-            xdata = []
-            ydata = []
-            for s in series:
-                mean_table =np.zeros((len(xTemplate)))
-                for v in p[1][s]:
-                    mean_table+= np.array(v)
-                ydata.append(mean_table/len(xTemplate))
-                xdata.append(xTemplate)
-            xdata = np.array(xdata).transpose()
-            ydata = np.array(ydata).transpose()
-            lines = ax.plot(xdata,ydata, marker="o")
-            sup = p[0].supplement.all()
-            lab = ""
-            for s in sup:
-                lab+=s.name+", "
-            lab =lab[:(len(lab)-2)]
-            for s in series:
-                lines[s-1].set_label("Seria "+str(s)+" - "+lab)
-        ax.legend()
-        to_return.append(fig)
+        val.append(float(v))
+    nval = len(val)
+    width = 1/len(sample_array)
+    axs = []
+    to_return = []
+    metric = met_set.pop()
+    fig = plt.figure(figsize=(11,7))
+    ax = fig.gca()
+    ax.set_xticks(val)
+    x = np.array(val)
+    for b in body['series_metric']:
+        ind = table['series_metric'].index(b)
+        dm = DetailedMetrics.objects.get(id=b[1])
+        data = table['mean_series'][ind]
+        err = table['error_bars'][ind]
+        line = ax.errorbar(x,data,yerr=err)
+        sup = dm.sample.supplement.all()
+        lab = "Seria "+str(b[0])+" - "
+        for s in sup:
+            lab+=s.name+", "
+        lab = lab[:(len(lab)-2)]
+        line.set_label(lab)
+        x+=width
+    ax.set_ylabel(metric.name + " - " + metric.unit)
+    ax.set_xlabel(ef.name + " - " + ef.unit)
+    ax.legend()
+    to_return.append(fig)
+    
     return to_return
 
-
-def handle_radar_plot(experiment_id,sample_array,table):
+def handle_radar_plot(experiment_id,sample_array,m_array):
+    table = handle_data_table(experiment_id,sample_array,m_array)
     ef = check_ef_samples(sample_array)
     keys = table.keys()
     nval = ef.numberOfValues
     val = ef.values.split(",")
     ret = []
+    etiq = []
     ymax = 0
     x = 0
     met_max = dict()
@@ -240,8 +214,8 @@ def handle_radar_plot(experiment_id,sample_array,table):
             except KeyError as i:
                 met_max[v[0][0]] = ymax
     ymax = 0
+    x = []
     for i in range(0,nval):
-        x = 0
         fig = plt.figure(figsize=(11,7))
         for k in keys:
             etiq = []
@@ -273,7 +247,7 @@ def handle_radar_plot(experiment_id,sample_array,table):
         for ax in f.get_axes():
             ax.set_rticks(rticks)
             ax.set_anchor('N')
-            ax.legend(loc=8, ncol=len(keys)/5+1)
+            ax.legend(loc=8, ncol=int(len(keys)/5+1))
     return ret
 
 def stats_data(data):
