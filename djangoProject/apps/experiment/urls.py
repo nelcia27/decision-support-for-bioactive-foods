@@ -22,6 +22,8 @@ urlpatterns = [
     path('experiment/geneerateXlsx/', generate_experiment_excel, name='generate_experiment_excel'),
     path('experiment/readXlsx/', read_experiment_data_from_xlsx, name='read_experiment_data_from_xlsx'),
     path('experiment/generatePDF/', generatePDF, name='generatePDF'),
-    path('experiment/generatePlots/', generatePlots, name='generatePlots'),
+    path('experiment/generateRadarPlots/', generateRadarPlots, name='generateRadarPlots'),
+    path('experiment/generateBarPlots/', generateBarPlots, name='generateBarPlots'),
+    path('experiment/generateLinearPlots/', generateLinearPlots, name='generateLinearPlots'),
     path('experiment/generateStats/', generateStats, name='generateStats'),
 ]

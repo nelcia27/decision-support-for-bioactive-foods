@@ -2,17 +2,17 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .serializers import *
 from .models import *
-import io
+import io, base64
 from django.http.response import HttpResponse, FileResponse
 import xlsxwriter
 import json
 from .forms import UploadFileForm
-from .functions import handle_experiment_data
+from .functions import handle_experiment_data, handle_radar_plot, handle_data_table, handle_bar_plot, handle_linear_plot
+
 from django.views.decorators.csrf import csrf_exempt
 from reportlab.pdfgen import canvas
 from PIL import Image
 from .functions import stats_data
-
 
 class CategoryView(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -173,12 +173,95 @@ def generatePDF(request):
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
-
 @csrf_exempt
-def generatePlots(request):
-    red = Image.new('RGB', (1, 1), (255,0,0,0))
-    response = HttpResponse(content_type="image/jpeg")
-    red.save(response, "JPEG")
+def generateRadarPlots(request):
+    #{
+    #   experiment_id:__,
+    #   samples:[_],
+    #   metrics:[_]
+    #}
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    arr = []
+    figs = handle_radar_plot(body['experiment_id'],body['samples'],body['metrics'])
+    for f in figs:
+        buffer = io.BytesIO()
+        f.savefig(buffer)
+        to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
+        arr.append(to_return)
+
+    v = json.dumps(dict({
+        "plots": arr
+    }))
+
+    response = HttpResponse(content_type="application/json")
+    response.write(v)
+    return response
+    
+@csrf_exempt
+def generateBarPlots(request):
+    #{
+    #   experiment_id:__,
+    #   series_metric:[[s1,m1], [s2,m2]]
+    #}
+    response = HttpResponse(content_type="application/json")
+    v = ""
+    if request.method == "POST":
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        arr = []
+        stats = json.loads(generateStats(request).content)
+        figs = handle_bar_plot(stats,body)
+        for f in figs:
+                buffer = io.BytesIO()
+                f.savefig(buffer, format='png')
+                to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
+                arr.append(to_return)
+
+        v = json.dumps(dict({
+            "message":"Plots generated",
+            "plots": arr
+        }))
+        response.status_code=200
+    else:
+        v = json.dumps({
+            "message": "Not POST method"
+        })
+        response.status_code=400
+
+    response.write(v)
+    return response
+    
+@csrf_exempt
+def generateLinearPlots(request):
+    #{
+    #   experiment_id:__,
+    #   series_metric:[[s1,m1], [s2,m2]]
+    #}
+    response = HttpResponse(content_type="application/json")
+    v = ""
+    if request.method == "POST":
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        arr = []
+        stats = json.loads(generateStats(request).content)
+        figs = handle_linear_plot(stats,body)
+        for f in figs:
+                buffer = io.BytesIO()
+                f.savefig(buffer, format='png')
+                to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
+                arr.append(to_return)
+
+        v = json.dumps(dict({
+            "plots": arr
+        }))
+    else:
+        v = json.dumps({
+            "message": "Not POST method"
+        })
+        response.status_code=400
+
+    response.write(v)
     return response
 
 @csrf_exempt
