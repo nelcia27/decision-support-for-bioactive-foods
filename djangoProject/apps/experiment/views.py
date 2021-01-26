@@ -202,8 +202,7 @@ def generatePlots(request):
             arr.append(to_return)
 
     v = json.dumps(dict({
-        "plots": arr,
-        "raw_table": table
+        "plots": arr
     }))
 
     response = HttpResponse(content_type="application/json")

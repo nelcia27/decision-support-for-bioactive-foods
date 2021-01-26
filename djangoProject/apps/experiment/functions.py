@@ -128,17 +128,17 @@ def handle_bar_plot(experiment_id,sample_array,table):
                     arr.append(v[3])
             met_dict[met].append((k,arr))
     xticks = np.arange(0,len(val))
-    width = 0.7/len(met_set)
+    width = 1.5/len(met_set)
     keys = met_dict.keys()
     for k in keys:
         fig, ax = plt.subplots(figsize=(11,7))
-        ax.set_title(k)
+        ax.set_ylabel(k)
         to_return.append(fig)
         axs.append(ax)
         ax.set_xticks(xticks)
         ax.set_xlabel(ef.name+" ["+ef.unit+"]")
         ax.set_xticklabels(val)
-        i = 0
+        i=0
         for pair in met_dict[k]:
             tmp = np.transpose(np.array(pair[1]))
             yt = []
@@ -245,13 +245,16 @@ def handle_radar_plot(experiment_id,sample_array,table):
             etiq = []
             y = []
             for pack in table[k]:
-                etiq.append(pack[0][0]+" - "+pack[0][1])
+                etiq.append(pack[0][0])
                 arr = np.transpose(np.array(pack[3]))
                 tmp = np.mean(arr[i])/met_max[pack[0][0]]
                 y.append(tmp)
                 if ymax < tmp:
                     ymax=tmp
-            x = np.linspace(start=0,stop=np.pi,num=len(etiq))
+            stop = 2*np.pi
+            if len(etiq) == 2:
+                stop = np.pi
+            x = np.linspace(start=0,stop=stop,num=len(etiq),endpoint=False)
             y+=y[:1]
             pol = plt.polar(np.append(x,x[0]),y,'o-')
             sup = Sample.objects.get(id=k).supplement.all()
