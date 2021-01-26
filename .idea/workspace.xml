@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ab90ccf3-91c2-4a03-8f8f-b7e2447a4579" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/djangoProject/apps/authentication/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/authentication/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -12,10 +12,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
+            <state relative-caret-position="-1683">
               <caret line="106" column="25" lean-forward="true" selection-start-line="106" selection-start-column="25" selection-end-line="106" selection-end-column="25" />
               <folding>
                 <element signature="e#0#51#0" expanded="true" />
@@ -41,11 +41,11 @@
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/djangoProject/apps/experiment/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="457">
-              <caret line="226" column="51" selection-start-line="226" selection-start-column="51" selection-end-line="226" selection-end-column="51" />
+            <state relative-caret-position="389">
+              <caret line="216" column="25" lean-forward="true" selection-start-line="216" selection-start-column="25" selection-end-line="216" selection-end-column="25" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -143,8 +143,8 @@
         <option value="$PROJECT_DIR$/djangoProject/apps/authentication/functions.py" />
         <option value="$PROJECT_DIR$/djangoProject/apps/authentication/urls.py" />
         <option value="$PROJECT_DIR$/djangoProject/apps/experiment/functions.py" />
-        <option value="$PROJECT_DIR$/djangoProject/apps/experiment/views.py" />
         <option value="$PROJECT_DIR$/djangoProject/apps/authentication/views.py" />
+        <option value="$PROJECT_DIR$/djangoProject/apps/experiment/views.py" />
       </list>
     </option>
   </component>
@@ -329,7 +329,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/djangoProject/apps/authentication/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
+        <state relative-caret-position="-1683">
           <caret line="106" column="25" lean-forward="true" selection-start-line="106" selection-start-column="25" selection-end-line="106" selection-end-column="25" />
           <folding>
             <element signature="e#0#51#0" expanded="true" />
@@ -398,8 +398,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/djangoProject/apps/experiment/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="457">
-          <caret line="226" column="51" selection-start-line="226" selection-start-column="51" selection-end-line="226" selection-end-column="51" />
+        <state relative-caret-position="389">
+          <caret line="216" column="25" lean-forward="true" selection-start-line="216" selection-start-column="25" selection-end-line="216" selection-end-column="25" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
