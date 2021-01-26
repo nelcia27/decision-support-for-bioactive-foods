@@ -1,6 +1,8 @@
 import xlrd
 from .models import *
 import statistics
+from scipy.stats import kstest
+from math import sqrt
 
 def handle_experiment_data(file):
     wb = xlrd.open_workbook(file_contents=file.read())
@@ -57,22 +59,16 @@ def stats_data(data):
         all_values.append(value_inside)
     mean_list = [[] for key in data.keys()]
     dx = [[] for key in data.keys()]
+    test_values = [[] for key in data.keys()]
+    bars = [[] for key in data.keys()]
     for i in range(len(all_values)):
         for j in range(len(all_values[i])):
+            test_values[i].append(kstest(all_values[i][j], 'norm'))
             mean = sum(all_values[i][j])/len(all_values[i][j])
             deviation = statistics.stdev(all_values[i][j])
             mean_list[i].append(mean)
             dx[i].append(deviation)
-    all_mean = []
-    all_dx = []
-    series_values = [[] for i in mean_list[0]]
-    for g in range(len(mean_list)):
-        for p in range(len(mean_list[g])):
-            series_values[p].append(mean_list[g][p])
-    for i in range(len(series_values)):
-        mean = sum(series_values[i])/len(series_values[i])
-        deviation = statistics.stdev(series_values[i])
-        all_mean.append(mean)
-        all_dx.append(deviation)
-    return mean_list,dx,all_mean,all_dx
+            bars[i].append(deviation/sqrt(len(all_values[i][j])))
+
+    return mean_list,dx,test_values,bars
 

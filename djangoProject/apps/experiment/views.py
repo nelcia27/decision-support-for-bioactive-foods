@@ -196,13 +196,15 @@ def generateStats(request):
             response.status_code = 400
             return (response)
         unique_series  = []
+        series_metric = []
         for i in range(len(experiment_results)):
-            if experiment_results[i].detailedMetric not in unique_series:
-                unique_series.append(experiment_results[i].detailedMetric)
+            if experiment_results[i].numberOfSeries not in unique_series:
+                unique_series.append(experiment_results[i].numberOfSeries)
+                series_metric.append([experiment_results[i].numberOfSeries,experiment_results[i].detailedMetric.id])
         values_series = {}
         for i in range(len(unique_series)):
             for j in range(len(experiment_results)):
-                if unique_series[i] == experiment_results[j].detailedMetric:
+                if unique_series[i] == experiment_results[j].numberOfSeries:
                     splitted_values = experiment_results[j].value.split(',')
                     for s in range(len(splitted_values)):
                         splitted_values[s] = float(splitted_values[s])
@@ -215,12 +217,13 @@ def generateStats(request):
         if len(values_series.keys()) <2:
             response_data['result'] = "brak odpowiedniej liczby wyników eksperymentu"
         else:
-            mean_list,dev,all_mean,all_dev = stats_data(values_series)
+            mean_list,dev,all_test,bars = stats_data(values_series)
             response_data['result'] = "wykonano"
             response_data['mean_series'] = mean_list
             response_data['standard_devation'] = dev
-            response_data['mean'] = all_mean
-            response_data['all_dev'] = all_dev
+            response_data['series_metric'] = series_metric
+            response_data['test'] = all_test
+            response_data['error_bars'] = bars
         response = HttpResponse(json.dumps(response_data))
         response.status_code = 200
         return response

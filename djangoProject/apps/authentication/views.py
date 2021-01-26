@@ -101,6 +101,8 @@ def get_user(request):
     if request.method == "GET":
         if request.user.is_authenticated:
             username = request.user.username
+        else:
+            username = ''
         response_data['username'] = username
         response = HttpResponse(json.dumps(response_data))
         response.status_code = 200
