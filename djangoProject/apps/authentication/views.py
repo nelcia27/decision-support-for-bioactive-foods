@@ -101,7 +101,12 @@ def get_user(request):
     if request.method == "GET":
         if request.user.is_authenticated:
             username = request.user.username
+            is_super = request.user.is_superuser
+        else:
+            username = ''
+            is_super = ''
         response_data['username'] = username
+        response_data['is_superuser'] = is_super
         response = HttpResponse(json.dumps(response_data))
         response.status_code = 200
         return (response)
