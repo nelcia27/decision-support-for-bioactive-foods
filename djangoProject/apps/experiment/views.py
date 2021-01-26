@@ -197,12 +197,12 @@ def generateStats(request):
             return (response)
         unique_series  = []
         for i in range(len(experiment_results)):
-            if experiment_results[i].numberOfSeries not in unique_series:
-                unique_series.append(experiment_results[i].numberOfSeries)
+            if experiment_results[i].detailedMetric not in unique_series:
+                unique_series.append(experiment_results[i].detailedMetric)
         values_series = {}
         for i in range(len(unique_series)):
             for j in range(len(experiment_results)):
-                if unique_series[i] == experiment_results[j].numberOfSeries:
+                if unique_series[i] == experiment_results[j].detailedMetric:
                     splitted_values = experiment_results[j].value.split(',')
                     for s in range(len(splitted_values)):
                         splitted_values[s] = float(splitted_values[s])
@@ -212,8 +212,8 @@ def generateStats(request):
 
                     else:
                         values_series[unique_series[i]].extend(splitted_values)
-        if len(values_series.keys()) <1:
-            response_data['result'] = "brak wyników eksperymentów"
+        if len(values_series.keys()) <2:
+            response_data['result'] = "brak odpowiedniej liczby wyników eksperymentu"
         else:
             mean_list,dev,all_mean,all_dev = stats_data(values_series)
             response_data['result'] = "wykonano"
