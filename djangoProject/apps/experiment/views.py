@@ -197,26 +197,30 @@ def generateStats(request):
             return (response)
         unique_series  = []
         series_metric = []
+        unique_metric = []
         for i in range(len(experiment_results)):
-            if experiment_results[i].numberOfSeries not in unique_series:
+            if [experiment_results[i].numberOfSeries,experiment_results[i].detailedMetric.id] not in series_metric:
                 unique_series.append(experiment_results[i].numberOfSeries)
                 series_metric.append([experiment_results[i].numberOfSeries,experiment_results[i].detailedMetric.id])
+        print(unique_series)
         values_series = {}
         for i in range(len(unique_series)):
             for j in range(len(experiment_results)):
-                if unique_series[i] == experiment_results[j].numberOfSeries:
+                if unique_series[i] == experiment_results[j].numberOfSeries and series_metric[i][1] == experiment_results[j].detailedMetric.id:
                     splitted_values = experiment_results[j].value.split(',')
                     for s in range(len(splitted_values)):
                         splitted_values[s] = float(splitted_values[s])
-                    if unique_series[i] not in values_series:
-                        values_series[unique_series[i]] = [len(splitted_values)]
-                        values_series[unique_series[i]].extend(splitted_values)
+                    if tuple(series_metric[i]) not in values_series:
+                        values_series[tuple(series_metric[i])] = [len(splitted_values)]
+                        values_series[tuple(series_metric[i])].extend(splitted_values)
 
                     else:
-                        values_series[unique_series[i]].extend(splitted_values)
+                        values_series[tuple(series_metric[i])].extend(splitted_values)
+        print(values_series)
         if len(values_series.keys()) <2:
             response_data['result'] = "brak odpowiedniej liczby wyników eksperymentu"
         else:
+            print(values_series)
             mean_list,dev,all_test,bars = stats_data(values_series)
             response_data['result'] = "wykonano"
             response_data['mean_series'] = mean_list
