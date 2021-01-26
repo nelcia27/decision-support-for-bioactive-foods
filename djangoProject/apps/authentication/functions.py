@@ -26,6 +26,7 @@ def password_check(password,password2):
         password_msg = 'password1 != password2'
     else:
         password_msg = 'password too weak'
+
     return password_ok,password_msg
 
 
