@@ -15,5 +15,6 @@ urlpatterns = [
     path("authentication/sign_out/", sign_out, name="sign_out"),
     path("authentication/active_users/", active_users, name="active_users"),
     path("authentication/super_user/", super_user, name="super_user"),
-    path("authentication/change_super_power/", change_super_power, name="change_super_power")
+    path("authentication/change_super_power/", change_super_power, name="change_super_power"),
+    path("authentication/get_user/", get_user, name="get_user")
 ]
