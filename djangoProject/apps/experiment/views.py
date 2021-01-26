@@ -285,7 +285,6 @@ def generateStats(request):
             if [experiment_results[i].numberOfSeries,experiment_results[i].detailedMetric.id] not in series_metric:
                 unique_series.append(experiment_results[i].numberOfSeries)
                 series_metric.append([experiment_results[i].numberOfSeries,experiment_results[i].detailedMetric.id])
-        print(unique_series)
         values_series = {}
         for i in range(len(unique_series)):
             for j in range(len(experiment_results)):
@@ -299,11 +298,9 @@ def generateStats(request):
 
                     else:
                         values_series[tuple(series_metric[i])].extend(splitted_values)
-        print(values_series)
         if len(values_series.keys()) <2:
             response_data['result'] = "brak odpowiedniej liczby wyników eksperymentu"
         else:
-            print(values_series)
             mean_list,dev,all_test,bars = stats_data(values_series)
             response_data['result'] = "wykonano"
             response_data['mean_series'] = mean_list
