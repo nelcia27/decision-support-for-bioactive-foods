@@ -123,7 +123,10 @@ def handle_bar_plot(table,body):
     for v in ef.values.split(","):
         val.append(float(v))
     nval = len(val)
-    width = val[0]*0.8/len(sample_array)
+    u = 1.5
+    if nval>1:
+        u = abs(val[0]-val[1])
+    width = u*0.5/len(sample_array)
     axs = []
     to_return = []
     metric = met_set.pop()
