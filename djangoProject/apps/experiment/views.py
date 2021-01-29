@@ -186,7 +186,7 @@ def generateRadarPlots(request):
     figs = handle_radar_plot(body['experiment_id'],body['samples'],body['metrics'])
     for f in figs:
         buffer = io.BytesIO()
-        f.savefig(buffer)
+        f.savefig(buffer, format='png')
         to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
         arr.append(to_return)
 
