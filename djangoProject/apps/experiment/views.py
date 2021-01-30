@@ -4,7 +4,6 @@ from .serializers import *
 from .models import *
 from fpdf import FPDF
 import io, base64, os
-import io, base64
 from django.http.response import HttpResponse, FileResponse
 import xlsxwriter
 import json
@@ -12,8 +11,6 @@ from .forms import UploadFileForm
 from .functions import handle_experiment_data, handle_radar_plot, handle_data_table, handle_bar_plot, \
     handle_linear_plot, truncate
 import matplotlib.pyplot as plt
-import tkinter as tk
-from tkinter import filedialog
 
 
 from django.views.decorators.csrf import csrf_exempt
@@ -644,22 +641,12 @@ def generatePdf(request):
     if plot_list:
         pdf.print_chapter(5, ch5, plot_list)
 
-    root = tk.Tk()
-    root.withdraw()
 
-    file_path = filedialog.askdirectory()
-    pdf.output(file_path + '/Eksperyment.pdf', 'F')
-    buffer = io.BytesIO()
-
-    p = canvas.Canvas(buffer)
-
-    p.drawString(100, 100, "Hello world.")
-
-    p.showPage()
-    p.save()
-
-    buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
+    file_name = './Eksperyment'+str(id_exp)+'.pdf'
+    pdf.output(file_name, 'F')
+    f = open(file_name,"rb")
+    response = FileResponse(f)
+    return response
 
 @csrf_exempt
 def get_Experiment_and_author(request):
