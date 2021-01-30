@@ -3,6 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="ab90ccf3-91c2-4a03-8f8f-b7e2447a4579" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,15 +23,10 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>body</find>
-    </findStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectId" id="1nUhhNLDUb1LOvUldHFbxgdCwK9" />
+  <component name="ProjectId" id="1nknOJWDKsnICqwahkxbMzV1wnV" />
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -68,9 +67,7 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>

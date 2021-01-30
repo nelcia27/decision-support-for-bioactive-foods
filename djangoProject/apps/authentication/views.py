@@ -96,6 +96,26 @@ def get_users(response):
     return(response)
 
 @csrf_exempt
+def get_user(request):
+    response_data = {}
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            username = request.user.username
+            is_super = request.user.is_superuser
+        else:
+            username = ''
+            is_super = ''
+        response_data['username'] = username
+        response_data['is_superuser'] = is_super
+        response = HttpResponse(json.dumps(response_data))
+        response.status_code = 200
+        return (response)
+    response_data['message'] = 'not GET'
+    response = HttpResponse(json.dumps(response_data))
+    response.status_code = 400
+    return(response)
+
+@csrf_exempt
 def change_email(response):
     regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
     response_data = {}
