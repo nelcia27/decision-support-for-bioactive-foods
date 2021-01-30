@@ -6,7 +6,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import statistics
 from scipy.stats import kstest
-from math import sqrt
+from math import sqrt, trunc
+
 
 def handle_experiment_data(file):
     wb = xlrd.open_workbook(file_contents=file.read())
@@ -123,7 +124,7 @@ def handle_bar_plot(table,body):
     for v in ef.values.split(","):
         val.append(float(v))
     nval = len(val)
-    u = 1.5
+    u = 2
     if nval>1:
         u = abs(val[0]-val[1])
     width = u*0.5/len(sample_array)
@@ -276,3 +277,18 @@ def stats_data(data):
 
     return mean_list,dx,test_values,bars
 
+
+def truncate(number, decimals=0):
+    """
+    Returns a value truncated to a specific number of decimal places.
+    """
+    if not isinstance(decimals, int):
+        raise TypeError("decimal places must be an integer.")
+    elif decimals < 0:
+        raise ValueError("decimal places has to be 0 or more.")
+    elif decimals == 0:
+        return trunc(number)
+
+    factor = 10.0 ** decimals
+
+    return trunc(float(number) * float(factor)) / float(factor)

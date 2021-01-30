@@ -69,6 +69,8 @@ class MetricsSerializer(serializers.ModelSerializer):
 
 
 class ExperimentSerializer(serializers.ModelSerializer):
+    author_name = serializers.ReadOnlyField(source='author.username')
+
     class Meta:
         model = Experiment
         fields = '__all__'

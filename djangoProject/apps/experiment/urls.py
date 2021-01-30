@@ -21,9 +21,12 @@ urlpatterns = [
     path('experiment/', include(router.urls)),
     path('experiment/geneerateXlsx/', generate_experiment_excel, name='generate_experiment_excel'),
     path('experiment/readXlsx/', read_experiment_data_from_xlsx, name='read_experiment_data_from_xlsx'),
-    path('experiment/generatePDF/', generatePDF, name='generatePDF'),
+    path('experiment/generatePdf/', generatePdf, name='generatePdf'),
+
     path('experiment/generateRadarPlots/', generateRadarPlots, name='generateRadarPlots'),
     path('experiment/generateBarPlots/', generateBarPlots, name='generateBarPlots'),
     path('experiment/generateLinearPlots/', generateLinearPlots, name='generateLinearPlots'),
     path('experiment/generateStats/', generateStats, name='generateStats'),
+    path('experiment/getPdfMetrics/', get_metrics_for_pdf, name='get_metrics_for_pdf'),
+    path('experiment/getUserNumber/', get_user_number, name='get_user_number')
 ]

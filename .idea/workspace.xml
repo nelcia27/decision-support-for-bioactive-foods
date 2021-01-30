@@ -2,6 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ab90ccf3-91c2-4a03-8f8f-b7e2447a4579" name="Default Changelist" comment="">
+
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/urls.py" afterDir="false" />
+
       <change beforePath="$PROJECT_DIR$/djangoProject/apps/experiment/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject/apps/experiment/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -10,6 +17,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
@@ -121,6 +129,12 @@
       </list>
     </option>
   </component>
+
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1nknOJWDKsnICqwahkxbMzV1wnV" />
+
   <component name="FindInProjectRecents">
     <findStrings>
       <find>body</find>
@@ -232,6 +246,16 @@
     </task>
     <servers />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />

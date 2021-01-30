@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator, validate_comma_separated_integer_list
 
 
+
 class Category(models.Model):
     name = models.CharField(primary_key=True, max_length=300, unique=True)
 
