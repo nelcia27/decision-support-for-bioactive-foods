@@ -106,3 +106,7 @@ media/
 *.pyc
 *.db
 *.pid
+DejaVuSansCondensed.pkl
+DejaVuSansCondensed.cw127.pkl
+DejaVuSansCondensed-BoldOblique.pkl
+DejaVuSansCondensed-BoldOblique.cw127.pkl

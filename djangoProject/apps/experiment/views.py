@@ -689,7 +689,7 @@ def generateRadarPlots(request):
     body = json.loads(body_unicode)
     arr = []
     figs = handle_radar_plot(body['experiment_id'], body['samples'], body['metrics'])
-    return figs
+    #return figs
     for f in figs:
         buffer = io.BytesIO()
         f.savefig(buffer)
