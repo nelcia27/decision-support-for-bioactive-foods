@@ -8,6 +8,7 @@ import statistics
 from scipy.stats import kstest
 from math import sqrt, trunc
 
+
 def handle_experiment_data(file):
     wb = xlrd.open_workbook(file_contents=file.read())
     result = []
@@ -123,7 +124,10 @@ def handle_bar_plot(table,body):
     for v in ef.values.split(","):
         val.append(float(v))
     nval = len(val)
-    width = val[0]*0.8/len(sample_array)
+    u = 2
+    if nval>1:
+        u = abs(val[0]-val[1])
+    width = u*0.5/len(sample_array)
     axs = []
     to_return = []
     metric = met_set.pop()
@@ -273,6 +277,7 @@ def stats_data(data):
 
     return mean_list,dx,test_values,bars
 
+
 def truncate(number, decimals=0):
     """
     Returns a value truncated to a specific number of decimal places.
@@ -287,4 +292,3 @@ def truncate(number, decimals=0):
     factor = 10.0 ** decimals
 
     return trunc(float(number) * float(factor)) / float(factor)
-

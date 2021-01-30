@@ -4,6 +4,7 @@ from .serializers import *
 from .models import *
 from fpdf import FPDF
 import io, base64, os
+import io, base64
 from django.http.response import HttpResponse, FileResponse
 import xlsxwriter
 import json
@@ -14,13 +15,13 @@ import matplotlib.pyplot as plt
 import tkinter as tk
 from tkinter import filedialog
 
+
 from django.views.decorators.csrf import csrf_exempt
 from reportlab.pdfgen import canvas
 from PIL import Image
 from .functions import stats_data
 import requests as req
 from django.contrib.auth import get_user_model
-
 
 class CategoryView(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -660,7 +661,6 @@ def generatePdf(request):
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
-
 @csrf_exempt
 def get_Experiment_and_author(request):
 
@@ -692,7 +692,8 @@ def generateRadarPlots(request):
     #return figs
     for f in figs:
         buffer = io.BytesIO()
-        f.savefig(buffer)
+        f.savefig(buffer, format='png')
+
         to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
         arr.append(to_return)
 
@@ -704,13 +705,47 @@ def generateRadarPlots(request):
     response.write(v)
     return response
 
-
+    
 @csrf_exempt
 def generateBarPlots(request):
-    # {
+    #{
     #   experiment_id:__,
     #   series_metric:[[s1,m1], [s2,m2]]
-    # }
+    #}
+    response = HttpResponse(content_type="application/json")
+    v = ""
+    if request.method == "POST":
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        arr = []
+        stats = json.loads(generateStats(request).content)
+        figs = handle_bar_plot(stats,body)
+        for f in figs:
+                buffer = io.BytesIO()
+                f.savefig(buffer, format='png')
+                to_return = base64.encodebytes(buffer.getvalue()).decode('utf-8')
+                arr.append(to_return)
+
+        v = json.dumps(dict({
+            "message":"Plots generated",
+            "plots": arr
+        }))
+        response.status_code=200
+    else:
+        v = json.dumps({
+            "message": "Not POST method"
+        })
+        response.status_code=400
+
+    response.write(v)
+    return response
+    
+@csrf_exempt
+def generateLinearPlots(request):
+    #{
+    #   experiment_id:__,
+    #   series_metric:[[s1,m1], [s2,m2]]
+    #}
     response = HttpResponse(content_type="application/json")
     v = ""
     if request.method == "POST":
@@ -787,31 +822,30 @@ def generateStats(request):
             response = HttpResponse(json.dumps(response_data))
             response.status_code = 400
             return (response)
-        unique_series = []
+        unique_series  = []
         series_metric = []
         unique_metric = []
         for i in range(len(experiment_results)):
-            if [experiment_results[i].numberOfSeries, experiment_results[i].detailedMetric.id] not in series_metric:
+            if [experiment_results[i].numberOfSeries,experiment_results[i].detailedMetric.id] not in series_metric:
                 unique_series.append(experiment_results[i].numberOfSeries)
-                series_metric.append([experiment_results[i].numberOfSeries, experiment_results[i].detailedMetric.id])
+                series_metric.append([experiment_results[i].numberOfSeries,experiment_results[i].detailedMetric.id])
         values_series = {}
         for i in range(len(unique_series)):
             for j in range(len(experiment_results)):
-                if unique_series[i] == experiment_results[j].numberOfSeries and series_metric[i][1] == \
-                        experiment_results[j].detailedMetric.id:
+                if unique_series[i] == experiment_results[j].numberOfSeries and series_metric[i][1] == experiment_results[j].detailedMetric.id:
                     splitted_values = experiment_results[j].value.split(',')
                     for s in range(len(splitted_values)):
                         splitted_values[s] = float(splitted_values[s])
                     if tuple(series_metric[i]) not in values_series:
                         values_series[tuple(series_metric[i])] = [len(splitted_values)]
                         values_series[tuple(series_metric[i])].extend(splitted_values)
-
                     else:
                         values_series[tuple(series_metric[i])].extend(splitted_values)
         if len(values_series.keys()) < 2:
             response_data['result'] = "brak odpowiedniej liczby wyników eksperymentu"
         else:
             mean_list, dev, all_test, bars = stats_data(values_series)
+
             response_data['result'] = "wykonano"
             response_data['mean_series'] = mean_list
             response_data['standard_devation'] = dev
@@ -825,3 +859,4 @@ def generateStats(request):
     response = HttpResponse(json.dumps(response_data))
     response.status_code = 400
     return response
+
